@@ -1,0 +1,5 @@
+package-lock.json linguist-generated=true -diff
+gui/package-lock.json linguist-generated=true -diff
+contracts/auction/dist/**/* linguist-generated=true -diff
+contracts/auction/ts/**/* linguist-generated=true -diff
+contracts/auction/index.wit linguist-generated=true -diff

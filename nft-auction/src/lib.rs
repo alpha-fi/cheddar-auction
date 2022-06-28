@@ -6,7 +6,7 @@ use near_sdk::{
     assert_one_yocto, env, ext_contract, near_bindgen, AccountId, Balance, Gas, PanicOnDefault,
     Promise, PromiseOrValue, CryptoHash, BorshStorageKey,
 };
-use near_contract_standards::non_fungible_token::{NonFungibleToken, Token, TokenId};
+use near_contract_standards::non_fungible_token::{TokenId};
 use std::cmp::min;
 use std::collections::HashMap;
 
@@ -33,9 +33,9 @@ const GAS_FOR_NFT_TRANSFER: Gas = 15_000_000_000_000;
 const BID_HISTORY_LENGTH_DEFAULT: u8 = 1;
 const NO_DEPOSIT: Balance = 0;
 const STORAGE_PER_SALE: u128 = 1000 * STORAGE_PRICE_PER_BYTE;
+const FIVE_MINS : u64 = 5 * 60 * 1000;
 static DELIMETER: &str = "||";
 
-pub type Bids = HashMap<FungibleTokenId, Vec<Bid>>;
 pub type TokenType = Option<String>;
 pub type FungibleTokenId = AccountId;
 pub type ContractAndTokenId = String;
@@ -55,7 +55,6 @@ pub struct Contract {
     pub sales: UnorderedMap<ContractAndTokenId, Sale>,
     pub by_owner_id: LookupMap<AccountId, UnorderedSet<ContractAndTokenId>>,
     pub by_nft_contract_id: LookupMap<AccountId, UnorderedSet<TokenId>>,
-    pub by_nft_token_type: LookupMap<AccountId, UnorderedSet<ContractAndTokenId>>,
     pub ft_token_ids: UnorderedSet<AccountId>,
     pub storage_deposits: LookupMap<AccountId, Balance>,
     pub bid_history_length: u8,
@@ -84,7 +83,6 @@ impl Contract {
             sales: UnorderedMap::new(StorageKey::Sales),
             by_owner_id: LookupMap::new(StorageKey::ByOwnerId),
             by_nft_contract_id: LookupMap::new(StorageKey::ByNFTContractId),
-            by_nft_token_type: LookupMap::new(StorageKey::ByNFTTokenType),
             ft_token_ids: UnorderedSet::new(StorageKey::FTTokenIds),
             storage_deposits: LookupMap::new(StorageKey::StorageDeposits),
             bid_history_length: bid_history_length.unwrap_or(BID_HISTORY_LENGTH_DEFAULT),

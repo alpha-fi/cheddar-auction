@@ -1,0 +1,319 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "AccountId": {
+      "maxLength": 64,
+      "minLength": 2,
+      "pattern": "^(([a-z\\d]+[-_])*[a-z\\d]+\\.)*([a-z\\d]+[-_])*[a-z\\d]+$",
+      "type": "string"
+    },
+    "u16": {
+      "maximum": 65535,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "u32": {
+      "maximum": 4294967295,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "u64": {
+      "maximum": 18446744073709552000,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "u8": {
+      "maximum": 255,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "Balance": {
+      "$ref": "#/definitions/U128",
+      "description": "Balance is a type for storing amounts of tokens, specified in yoctoNEAR."
+    },
+    "U128": {
+      "description": "String representation of a u128-bit integer",
+      "pattern": "^[0-9]+$",
+      "type": "string"
+    },
+    "FTType": {
+      "description": "type of ft to pay bid for nft auction --- near or token-v3.cheddar.testnet",
+      "type": "string"
+    },
+    "TokenId": {
+      "description": "token id of nft",
+      "type": "string"
+    },
+    "StorageDeposit": {
+      "additionalProperties": false,
+      "allow": [
+        "::owner"
+      ],
+      "contractMethod": "change",
+      "description": "Deposit Near Token!",
+      "properties": {
+        "args": {},
+        "options": {
+          "additionalProperties": false,
+          "properties": {
+            "attachedDeposit": {
+              "$ref": "#/definitions/Balance",
+              "default": "10000000000000000000000",
+              "description": "Units in yoctoNear"
+            },
+            "gas": {
+              "default": "30000000000000",
+              "description": "Units in gas",
+              "pattern": "[0-9]+",
+              "type": "string"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "required": [
+        "options"
+      ],
+      "type": "object"
+    },
+    "CreateAuction": {
+      "additionalProperties": false,
+      "allow": [
+        "::owner"
+      ],
+      "contractMethod": "change",
+      "description": "Create Auction for NFT!",
+      "properties": {
+        "args": {
+          "additionalProperties": false,
+          "properties": {
+            "token_id": {
+              "$ref": "#/definitions/TokenId",
+              "description": "id of nft to create auction"
+            },
+            "account_id": {
+              "$ref": "#/definitions/AccountId",
+              "default": "test_cheddar_auction2.testnet",
+              "description": "address of auction contract"
+            },
+            "period": {
+              "$ref": "#/definitions/u32",
+              "description": "period of auction",
+              "default": 10000000
+            },
+            "price": {
+              "$ref": "#/definitions/u32",
+              "description": "initial price for nft auction",
+              "default": 10
+            },
+            "token_type": {
+              "$ref": "#/definitions/FTType",
+              "default": "near",
+              "description": "FT type for pay bid of auction"
+            }
+          },
+          "required": [
+            "token_id",
+            "account_id",
+            "period",
+            "token_type"
+          ],
+          "type": "object"
+        },
+        "options": {
+          "additionalProperties": false,
+          "properties": {
+            "attachedDeposit": {
+              "$ref": "#/definitions/Balance",
+              "default": "10000000000000000000000",
+              "description": "Units in yoctoNear"
+            },
+            "gas": {
+              "default": "30000000000000",
+              "description": "Units in gas",
+              "pattern": "[0-9]+",
+              "type": "string"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "required": [
+        "options"
+      ],
+      "type": "object"
+    },
+    "Offer": {
+      "additionalProperties": false,
+      "allow": [
+        "::owner"
+      ],
+      "contractMethod": "change",
+      "description": "Create Auction for NFT!",
+      "properties": {
+        "args": {
+          "additionalProperties": false,
+          "properties": {
+            "token_id": {
+              "$ref": "#/definitions/TokenId",
+              "description": "id of nft to create auction"
+            }
+          },
+          "required": [
+            "token_id"
+          ],
+          "type": "object"
+        },
+        "options": {
+          "additionalProperties": false,
+          "properties": {
+            "attachedDeposit": {
+              "$ref": "#/definitions/Balance",
+              "default": "12",
+              "description": "Units in NEAR"
+            },
+            "gas": {
+              "default": "30000000000000",
+              "description": "Units in gas",
+              "pattern": "[0-9]+",
+              "type": "string"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "required": [
+        "options"
+      ],
+      "type": "object"
+    },
+    "AcceptOffer": {
+      "additionalProperties": false,
+      "allow": [
+        "::owner"
+      ],
+      "contractMethod": "change",
+      "description": "Accept Offer for NFT!",
+      "properties": {
+        "args": {
+          "additionalProperties": false,
+          "properties": {
+            "token_id": {
+              "$ref": "#/definitions/TokenId",
+              "description": "id of nft to create auction"
+            }
+          },
+          "required": [
+            "token_id"
+          ],
+          "type": "object"
+        },
+        "options": {
+          "additionalProperties": false,
+          "properties": {
+            "gas": {
+              "default": "200000000000000",
+              "description": "Units in gas",
+              "pattern": "[0-9]+",
+              "type": "string"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "required": [
+        "options"
+      ],
+      "type": "object"
+    },
+    "RemoveSale": {
+      "additionalProperties": false,
+      "allow": [
+        "::owner"
+      ],
+      "contractMethod": "change",
+      "description": "Remove Auction for NFT!",
+      "properties": {
+        "args": {
+          "additionalProperties": false,
+          "properties": {
+            "token_id": {
+              "$ref": "#/definitions/TokenId",
+              "description": "id of nft to create auction"
+            }
+          },
+          "required": [
+            "token_id"
+          ],
+          "type": "object"
+        },
+        "options": {
+          "additionalProperties": false,
+          "properties": {
+            "attachedDeposit": {
+              "$ref": "#/definitions/Balance",
+              "default": "1",
+              "description": "Units in NEAR"
+            },
+            "gas": {
+              "default": "30000000000000",
+              "description": "Units in gas",
+              "pattern": "[0-9]+",
+              "type": "string"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "required": [
+        "options"
+      ],
+      "type": "object"
+    },
+    "GetSupplySales": {
+      "additionalProperties": false,
+      "contractMethod": "view",
+      "description": "Current supplies of auction sales",
+      "properties": {
+        "args": {
+          "additionalProperties": false,
+          "type": "object"
+        }
+      },
+      "required": [
+        "args"
+      ],
+      "type": "object"
+    },
+    "GetSalesByOwnerId": {
+      "additionalProperties": false,
+      "contractMethod": "view",
+      "description": "Current supplies of auction sales",
+      "properties": {
+        "args": {
+          "additionalProperties": false,
+          "type": "object",
+          "properties": {
+            "account_id": {
+              "$ref": "#/definitions/AccountId",
+              "description": "address of auction contract"
+            },
+            "from_index": {
+              "$ref": "#/definitions/U128",
+              "default": "0"
+            },
+            "limit": {
+              "$ref": "#/definitions/u64",
+              "default": 50
+            }
+
+          }
+        }
+      },
+      "required": [
+        "args"
+      ],
+      "type": "object"
+    }
+  }
+}

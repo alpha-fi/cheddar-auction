@@ -1,5 +1,4 @@
 use crate::*;
-use log::info;
 /// approval callbacks from NFT Contracts
 
 #[derive(Serialize, Deserialize)]
@@ -33,11 +32,9 @@ impl NonFungibleTokenApprovalsReceiver for Contract {
         msg: String,
     ) {
         // enforce cross contract call and owner_id is signer
-        info!("It works!");
         let SaleArgs { period, token_type, price, nft_contract_id } = 
             near_sdk::serde_json::from_str(&msg).expect("Not valid SaleArgs");
 
-        // let nft_contract_id = env::predecessor_account_id();
         let signer_id = env::signer_account_id();
         assert_ne!(
             nft_contract_id.to_string(),
@@ -54,6 +51,12 @@ impl NonFungibleTokenApprovalsReceiver for Contract {
             true,
             "end time must bigger than now"
         );
+        assert_eq!(
+            price > 0,
+            true,
+            "price must be bigger than zero"
+        );
+
         let created_at = env::block_timestamp() / 1000000;
         let end_at = created_at + period;
 
@@ -62,6 +65,7 @@ impl NonFungibleTokenApprovalsReceiver for Contract {
         let storage_amount = self.storage_amount().0;
         let owner_paid_storage = self.storage_deposits.get(&signer_id).unwrap_or(0);
         let signer_storage_required = (self.get_supply_by_owner_id(signer_id).0 + 1) as u128 * storage_amount;
+        
         assert!(
             owner_paid_storage >= signer_storage_required,
             "Insufficient storage paid: {}, for {} sales at {} rate of per sale",
@@ -75,8 +79,6 @@ impl NonFungibleTokenApprovalsReceiver for Contract {
                 );
             }
 
-            let bids = HashMap::new();
-
             let contract_and_token_id = format!("{}{}{}", nft_contract_id, DELIMETER, token_id);
             self.sales.insert(
                 &contract_and_token_id,
@@ -86,10 +88,10 @@ impl NonFungibleTokenApprovalsReceiver for Contract {
                     nft_contract_id: nft_contract_id.to_string(),
                     token_id: token_id.clone(),
                     price,
-                    bids,
                     created_at: U64(env::block_timestamp()/1000000),
                     end_at,
                     token_type: token_type,
+                    bids: None,
                 },
             );
     
@@ -125,6 +127,10 @@ impl NonFungibleTokenApprovalsReceiver for Contract {
             by_nft_contract_id.insert(&contract_and_token_id);
             self.by_nft_contract_id
                 .insert(&nft_contract_id, &by_nft_contract_id);
+        } else {
+            env::panic(
+                ("Token type need to be specified.").as_bytes(),
+            );
         }
     }
 }

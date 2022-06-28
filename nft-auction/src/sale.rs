@@ -16,7 +16,7 @@ pub struct Sale {
     pub nft_contract_id: String,
     pub token_id: String,
     pub price: u128,
-    pub bids: Bids,
+    pub bids: Option<HashMap<FungibleTokenId, Bid>>,
     pub created_at: U64,
     pub end_at: u64,
     pub token_type: String
@@ -40,32 +40,30 @@ impl Contract {
         let sale = self.internal_remove_sale(nft_contract_id.into(), token_id);
         let owner_id = env::predecessor_account_id();
         assert_eq!(owner_id, sale.owner_id, "Must be sale owner");
-        self.refund_all_bids(&sale.bids);
+        self.refund_bids(sale.bids.unwrap_or_default());
     }
 
     #[payable]
-    pub fn offer(&mut self, nft_contract_id: ValidAccountId, offer_price: u128, token_id: String ) {
+    pub fn offer(&mut self, nft_contract_id: ValidAccountId, token_id: String ) {
         let contract_id: AccountId = nft_contract_id.into();
         let contract_and_token_id = format!("{}{}{}", contract_id, DELIMETER, token_id);
-        let mut sale = self.sales.get(&contract_and_token_id).expect("No sale");
+        let sale = self.sales.get(&contract_and_token_id).expect("No sale");
+
         let buyer_id = env::predecessor_account_id();
         assert_ne!(sale.owner_id, buyer_id, "Cannot bid on your own sale.");
+
         let ft_token_id = sale.token_type.clone();
-        let price = sale.price;
+        assert_eq!(ft_token_id, "near", "Cannot pay offer with near.");
 
         let deposit = env::attached_deposit();
-
-        if ft_token_id == "near" && price > 0 {
-            assert!(deposit > 0, "Attached deposit must be greater than 0");
-            assert!(deposit >= price, "Attached deposit must be greater than reserve price");
-        }
+        assert!(deposit > 0, "Attached deposit must be greater than 0");
+        assert!(deposit > sale.price, "Deposit amount must be bigger than reserve price");
 
         self.add_bid(
             contract_and_token_id,
-            offer_price,
+            deposit,
             ft_token_id,
             buyer_id,
-            &mut sale,
         );
     }
 
@@ -73,46 +71,40 @@ impl Contract {
     pub fn add_bid(
         &mut self,
         contract_and_token_id: ContractAndTokenId,
-        amount: Balance,
+        price: Balance,
         ft_token_id: AccountId,
         buyer_id: AccountId,
-        sale: &mut Sale,
     ) {
+        let mut sale = self.sales.get(&contract_and_token_id).expect("No sale");
+        let mut bids = sale.bids.unwrap_or_default();
+        
+        let now = env::block_timestamp() / 1000000;
+        assert!(sale.end_at > now, "auction is finished already");
+        if (sale.end_at - FIVE_MINS) < now {
+            sale.end_at = now + FIVE_MINS;
+        }
+
         // store a bid and refund any current bid lower
         let new_bid = Bid {
             owner_id: buyer_id,
-            price: U128(amount),
+            price: U128(price),
         };
-        
-        let bids_for_token_id = sale.bids.entry(ft_token_id.clone()).or_insert_with(Vec::new);
-        
-        if !bids_for_token_id.is_empty() {
-            let current_bid = &bids_for_token_id[bids_for_token_id.len()-1];
+
+        let current_bid = bids.get(&ft_token_id);
+        if let Some(current_bid) = current_bid {
+            // refund current bid holder
+            let current_price: u128 = current_bid.price.into();
             assert!(
-                amount > current_bid.price.0,
+                price > current_price,
                 "Can't pay less than or equal to current bid price: {}",
-                current_bid.price.0
+                current_price
             );
-            if ft_token_id == "near" {
-                Promise::new(current_bid.owner_id.clone()).transfer(u128::from(current_bid.price));
-            } 
-            else {
-                ext_contract::ft_transfer(
-                    current_bid.owner_id.clone(),
-                    current_bid.price,
-                    None,
-                    &ft_token_id,
-                    1,
-                    GAS_FOR_FT_TRANSFER,
-                );
-            }
+            Promise::new(current_bid.owner_id.clone()).transfer(current_bid.price.into());
+            bids.insert(ft_token_id, new_bid);
+        } else {
+            bids.insert(ft_token_id, new_bid);
         }
-        
-        bids_for_token_id.push(new_bid);
-        if bids_for_token_id.len() > self.bid_history_length as usize {
-            bids_for_token_id.remove(0);
-        }
-        
+        sale.bids = Some(bids);
         self.sales.insert(&contract_and_token_id, &sale);
     }
 
@@ -126,8 +118,10 @@ impl Contract {
         // remove bid before proceeding to process purchase
         let mut sale = self.sales.get(&contract_and_token_id).expect("No sale");
         let ft_token_id = sale.token_type.clone();
-        let bids_for_token_id = sale.bids.remove(&ft_token_id).expect("No bids");
-        let bid = &bids_for_token_id[bids_for_token_id.len()-1];
+        
+        let mut bids = sale.bids.unwrap_or_default();
+        let bid = bids.remove(&ft_token_id).expect("No bid");
+        sale.bids = Some(bids);
         self.sales.insert(&contract_and_token_id, &sale);
         // panics at `self.internal_remove_sale` and reverts above if predecessor is not sale.owner_id
         self.process_purchase(
@@ -182,7 +176,7 @@ impl Contract {
         sale: Sale,
         price: U128,
     ) -> U128 {
-
+        let bids = sale.bids.unwrap_or_default();
         // checking for payout information
         let payout_option = promise_result_as_success().and_then(|value| {
             // None means a bad payout from bad NFT contract
@@ -190,7 +184,7 @@ impl Contract {
                 .ok()
                 .and_then(|payout| {
                     // gas to do 10 FT transfers (and definitely 10 NEAR transfers)
-                    if payout.len() + sale.bids.len() > 10 || payout.is_empty() {
+                    if payout.len() + bids.len() > 10 || payout.is_empty() {
                         env::log(format!("Cannot have more than 10 royalties and sale.bids refunds").as_bytes());
                         None
                     } else {
@@ -218,8 +212,7 @@ impl Contract {
             return price;
         };
         // Going to payout everyone, first return all outstanding bids (accepted offer bid was already removed)
-        self.refund_all_bids(&sale.bids);
-
+        self.refund_bids(bids);
         // NEAR payouts
         if ft_token_id == "near" {
             for (receiver_id, amount) in payout {
@@ -241,6 +234,28 @@ impl Contract {
             }
             // keep all FTs (already transferred for payouts)
             U128(0)
+        }
+    }
+
+    /// refund the last bid of each token type, don't update sale because it's already been removed
+
+    fn refund_bids(
+        &mut self,
+        bids: HashMap<FungibleTokenId, Bid>,
+    ) {
+        for (bid_ft, bid) in bids {
+            if bid_ft == "near" {
+                Promise::new(bid.owner_id.clone()).transfer(u128::from(bid.price));
+            } else {
+                ext_contract::ft_transfer(
+                    bid.owner_id.clone(),
+                    bid.price,
+                    None,
+                    &bid_ft,
+                    1,
+                    GAS_FOR_FT_TRANSFER,
+                );
+            }
         }
     }
 }

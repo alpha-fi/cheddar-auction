@@ -1,0 +1,5 @@
+.button.secondary, button.secondary {
+    background-color: transparent;
+    border: 1px solid var(--gray-3);
+    color: var(--fg);
+}
