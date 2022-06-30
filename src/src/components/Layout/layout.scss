@@ -42,6 +42,7 @@ $tertiary: #aad055 !default;
   --gray-8: rgba(38,38,38,.8);
   --gray-9: rgba(38,38,38,.9);
   --red: #fc5b5b;
+  --br-small: 6px;
 }
 
 html {
@@ -190,7 +191,7 @@ input,
 select,
 button,
 .button {
-  padding: var(--spacing-s) var(--spacing-m);
+  // padding: var(--spacing-s) var(--spacing-m);
   margin-bottom: var(--spacing-xs);
 }
 

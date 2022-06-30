@@ -9,7 +9,12 @@ export const Header = () => {
     const location = useLocation();
     const currentPath = location.pathname;
 
-    const { wallet, signIn, signOut } = useNear()
+    const { wallet, signIn, signOut } = useNear();
+
+    const isMarketplace =() => {
+        console.log("currentPath", currentPath, currentPath.split('/'));
+        if(currentPath.split('/')[1] == "marketplace") return true;
+    }
 
     return (
         <nav className={css.header}>
@@ -26,22 +31,24 @@ export const Header = () => {
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" style={{width: "24px"}}><path fill="var(--accent)" d="M21.53 7.11c.02.22.02.43.02.64 0 6.5-4.95 14-14 14-2.78 0-5.37-.81-7.55-2.21a10.17 10.17 0 0 0 7.3-2.04 4.93 4.93 0 0 1-4.6-3.41 5.2 5.2 0 0 0 2.22-.1A4.92 4.92 0 0 1 .97 9.18V9.1c.66.36 1.42.6 2.23.62a4.92 4.92 0 0 1-1.52-6.58A13.98 13.98 0 0 0 11.82 8.3a4.92 4.92 0 0 1 8.4-4.5 9.68 9.68 0 0 0 3.11-1.18 4.9 4.9 0 0 1-2.16 2.71c.99-.1 1.95-.38 2.83-.76-.67.97-1.5 1.84-2.47 2.54Z"></path></svg>
                             </div>
                         </a>
-                        {currentPath == "/" ? 
-                            <div className={css.header_tab} style={{borderBottom: "2px solid black"}} onClick={e => navigate("/")}>My Assets</div> : 
-                            <div className={css.header_tab} onClick={e => navigate("/")}>My Assets</div>
-                        }
-                        {currentPath == "/marketplace" ? 
+                        {isMarketplace() ? 
                             <div className={css.header_tab} style={{borderBottom: "2px solid black"}} onClick={e => navigate("/marketplace")}>Marketplace</div> : 
                             <div className={css.header_tab} onClick={e => navigate("/marketplace")}>Marketplace</div>
                         }
                     </div>
-                    {wallet && (
-                        wallet.getAccountId() ? (
-                            <button className="secondary" onClick={signOut}>{wallet.getAccountId()}</button>
-                        ) : (
-                            <button className="secondary" onClick={signIn}>Sign In</button>
-                        )
-                    )}
+                    <div style={{display: "flex"}}>
+                        {!isMarketplace() ? 
+                            <div className={css.header_tab} style={{borderBottom: "2px solid black", marginRight: "15px"}} onClick={e => navigate("/")}>My Assets</div> : 
+                            <div className={css.header_tab} style={{marginRight: "15px"}} onClick={e => navigate("/")}>My Assets</div>
+                        }
+                        {wallet && (
+                            wallet.getAccountId() ? (
+                                <button className="secondary" onClick={signOut}>{wallet.getAccountId()}</button>
+                            ) : (
+                                <button className="secondary" onClick={signIn}>Sign In</button>
+                            )
+                        )}
+                    </div>
                 </div>
             </div>
         </nav>

@@ -70,7 +70,7 @@ export class AuctionContract {
     const nft_contract_id = this.nft_contract_id;
 
     const new_arg = {
-      token_id: args.token_id,
+      token_id: args.token_id.toString(),
       account_id: args.account_id,
       msg: JSON.stringify({ period, token_type, price, nft_contract_id })
     }
@@ -79,7 +79,7 @@ export class AuctionContract {
   }
 
   create_auctionRaw(args: {
-    token_id: u32;
+    token_id: string;
     account_id: AccountId;
     msg?: string;
   }, options?: ChangeMethodOptions): Promise<providers.FinalExecutionOutcome> {
@@ -147,6 +147,15 @@ export class AuctionContract {
   get_sale(args: {nft_contract_token: string}, options?: ViewFunctionOptions): Promise<Sale>{
     return this.account.viewFunction(this.contractId, "get_sale", args, options);
   }
+
+  get_sales_by_nft_contract_id(args: {from_index: string, limit: u64}, options?: ViewFunctionOptions): Promise<Sale[]>{
+    const new_args = {
+      nft_contract_id: this.nft_contract_id,
+      form_index: args.from_index,
+      limit: args.limit
+    }
+    return this.account.viewFunction(this.contractId, "get_sales_by_nft_contract_id", new_args, options)
+  }
 }
 
 export interface Sale {
@@ -157,5 +166,11 @@ export interface Sale {
   price: u64,
   created_at: U128,
   end_at: U128,
-  token_type: string
+  token_type: string,
+  bids: Object
+}
+
+export interface Bid{
+  owner_id: AccountId,
+  price: U128
 }

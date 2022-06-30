@@ -1,4 +1,4 @@
-const contractName = 'test_cheddar_auction2.testnet';
+const contractName = 'v4.test_cheddar_auction2.testnet';
 
 module.exports = function getConfig() {
 	let config = {

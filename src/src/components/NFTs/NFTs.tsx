@@ -5,6 +5,7 @@ import useTenkNear from "../../hooks/useTenkNear"
 import useAuctionNear from "../../hooks/useAuctionNear"
 import {TenkContract, Token} from "../../near/contracts/tenk/index"
 import {Sale} from "../../near/contracts/auction/index"
+import { AUCTION_CONTRACT_ACCOUNT, TENK_CONTRACT_ACCOUNT } from "../Constants/Contracts"
 
 export const DELIMETER = "||";
 
@@ -49,24 +50,37 @@ export const NFTs = () => {
     }, [Tenk])
 
     const getSaleForNFT = async(nftid: string) => {
-        const args = {nft_contract_token: `${Auction?.account}${DELIMETER}${nftid}`};
-        const res: Sale = await Auction?.account.viewFunction(Auction.contractId, "get_sale", args, );
+        const nft_contract_token = TENK_CONTRACT_ACCOUNT + DELIMETER + nftid;
+        const args = {nft_contract_token: nft_contract_token};
+        console.log("args", args, Auction);
+
+        const res: Sale = await Auction?.account.viewFunction(AUCTION_CONTRACT_ACCOUNT, "get_sale", args, );
+        console.log(res);
         return res;
     }
 
     const goToDetail = (nftid: string): void =>  {
-        navigate(`/asset/${nftid}`);
+        navigate(`/myassets/asset/${nftid}`);
     };
 
     
     return (
-        <div style={{width: "100%"}}>
+        <div style={{width: "100%", minHeight: "450px"}}>
             <div className="dlion">
-                <div className={css.nft_header}>
-                    <div className={css.desc}>
-                        <a href="https://explorer.testnet.near.org/accounts/nft.cheddar.testnet" title="Cheddar" target="_blank" rel="noopener noreferrer">Cheddar</a>
-                    </div>
-                </div>
+                {nfts && nfts?.length > 0 ? 
+                    (                
+                        <div className={css.nft_header}>
+                            <div className={css.desc}>
+                                <a href="https://explorer.testnet.near.org/accounts/nft.cheddar.testnet" title="Cheddar" target="_blank" rel="noopener noreferrer">Cheddar</a>
+                            </div>
+                        </div>
+                    ):
+                    (
+                        <div style={{display: "flex", justifyContent: "center"}}>
+                            No NFTs
+                        </div>
+                    )
+                }
                 <div className={css.nft_tokens}>
                     <>
                         {nfts?.map(nft => {
@@ -75,9 +89,14 @@ export const NFTs = () => {
                                     <img alt="NFT" src={"https://bafybeibghcllcmurku7lxyg4wgxn2zsu5qqk7h4r6bmyhpztmyd564cx54.ipfs.nftstorage.link/" + nft.token.metadata?.media}  onClick={e => goToDetail(nft.token.token_id)}/>
                                     <div className={css.nft_token_info}>
                                         <b className="title">{nft.token.token_id}</b>
-                                        {!nft.sale && (
-                                            <button className="secondary" onClick={e=> navigate(`/auction/${nft.token.token_id}`)}>Create Auction</button>
-                                        )}
+                                        {nft.sale ? 
+                                            (
+                                                <button className="secondary" onClick={e=> navigate(`/marketplace/view/${nft.token.token_id}`)}>View Auction</button>
+                                            ):
+                                            (
+                                                <button className="secondary" onClick={e=> navigate(`/myassets/auction/${nft.token.token_id}`)}>Create Auction</button>
+                                            )
+                                        }
                                     </div>
                                 </div>
                             )

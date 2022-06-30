@@ -1,14 +1,11 @@
-import { useNavigate, useParams, useSearchParams } from "react-router-dom"
-import React, { useEffect, useMemo, useState } from "react"
+import { useParams } from "react-router-dom"
+import { useEffect, useState } from "react"
 import useTenkNear from "../../hooks/useTenkNear"
-import useAuctionNear from "../../hooks/useAuctionNear";
 import {Token} from "../../near/contracts/tenk/index"
-import {Sale} from "../../near/contracts/auction/index"
 import css from "./NFTDetail.module.css"
 
 export const NFTDetail = () => {
     const { Tenk } = useTenkNear();
-    const { Auction } = useAuctionNear();
 
     const [nft, setNFT] = useState<Token>();
     // const [auction, setAuction] = useState<
@@ -27,10 +24,6 @@ export const NFTDetail = () => {
                 console.log(nft);
             }
         }
-
-        const getAuction =async () => {
-            
-        }
         getNFTs();
     }, [Tenk])
 
@@ -41,7 +34,10 @@ export const NFTDetail = () => {
                     <img alt="NFT" src={"https://bafybeibghcllcmurku7lxyg4wgxn2zsu5qqk7h4r6bmyhpztmyd564cx54.ipfs.nftstorage.link/" + nft?.metadata?.media}/>
                 </div>
                 <div className={css.nft_token}>
+                    <b className="title">Detail of NFT</b><br/><br/>
                     <b className="title">Token ID: {nft?.token_id}</b><br/>
+                    <b className="title">Owner: {nft?.owner_id}</b><br/>
+                    <b className="title">Title: {nft?.metadata?.title}</b><br/>
                     <b className="title">Description: {nft?.metadata?.description}</b>
                 </div>
             </div>

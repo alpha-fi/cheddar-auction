@@ -7,7 +7,7 @@ export {BN};
 
 export interface ChangeMethodOptions {
   gas?: BN;
-  attachedDeposit: BN;
+  attachedDeposit?: BN;
   walletMeta?: string;
   walletCallbackUrl?: string;
 }

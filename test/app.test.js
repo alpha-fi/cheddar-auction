@@ -59,23 +59,23 @@ describe('deploy contract ' + contractName, () => {
 		bob = await getAccount(bobId);
 		storageMarket = parseNearAmount('0.01');
 		
-		// // const market = getAccount(marketId);
-		// // const marketAccountState = await market.state();
-		// // console.log('\n\nstate:', marketAccountState, '\n\n');
-		// // if (marketAccountState.code_hash === '11111111111111111111111111111111') {
-		// 	marketAccount = await getAccount(marketId);
-		// 	const marketContractBytes = fs.readFileSync('./out/main.wasm');
-		// 	console.log('\n\n deploying marketAccount contractBytes:', marketContractBytes.length, '\n\n');
-		// 	const newMarketArgs = {
-		// 		owner_id: contractId,
-		// 		bid_history_length: BID_HISTORY_LENGTH,
-		// 	};
-		// 	const actions = [
-		// 		deployContract(marketContractBytes),
-		// 		functionCall('new', newMarketArgs, GAS)
-		// 	];
-		// 	await marketAccount.signAndSendTransaction({ receiverId: marketId, actions });
-		// // }
+		// const market = getAccount(marketId);
+		// const marketAccountState = await market.state();
+		// console.log('\n\nstate:', marketAccountState, '\n\n');
+		// if (marketAccountState.code_hash === '11111111111111111111111111111111') {
+			marketAccount = await getAccount(marketId);
+			const marketContractBytes = fs.readFileSync('./out/main.wasm');
+			console.log('\n\n deploying marketAccount contractBytes:', marketContractBytes.length, '\n\n');
+			const newMarketArgs = {
+				owner_id: contractId,
+				bid_history_length: BID_HISTORY_LENGTH,
+			};
+			const actions = [
+				deployContract(marketContractBytes),
+				functionCall('new', newMarketArgs, GAS)
+			];
+			await marketAccount.signAndSendTransaction({ receiverId: marketId, actions });
+		// }
 	});
 
 	test('alice approves a sale for NEAR', async () => {
@@ -90,26 +90,26 @@ describe('deploy contract ' + contractName, () => {
 			attachedDeposit: parseNearAmount('0.1')
 		});
 
-		const price = 1;
-		const period = 100000;
+		// const price = 1;
+		// const period = 100000;
 
-		await alice.functionCall({
-			contractId: nftId,
-			methodName: 'nft_approve',
-			args: {
-				token_id,
-				account_id: marketId,
-				msg: JSON.stringify({ period, token_type, price, nft_contract_id })
-			},
-			gas: GAS,
-			attachedDeposit: parseNearAmount('0.01')
-		});
+		// await alice.functionCall({
+		// 	contractId: nftId,
+		// 	methodName: 'nft_approve',
+		// 	args: {
+		// 		token_id,
+		// 		account_id: marketId,
+		// 		msg: JSON.stringify({ period, token_type, price, nft_contract_id })
+		// 	},
+		// 	gas: GAS,
+		// 	attachedDeposit: parseNearAmount('0.01')
+		// });
 
-		const sale = await alice.viewFunction(marketId, 'get_sale', {
-			nft_contract_token: nftId + DELIMETER + token_id
-		});
-		console.log('\n\n get_sale result for nft', sale, '\n\n');
-		expect(sale.price).toEqual(price);
+		// const sale = await alice.viewFunction(marketId, 'get_sale', {
+		// 	nft_contract_token: nftId + DELIMETER + token_id
+		// });
+		// console.log('\n\n get_sale result for nft', sale, '\n\n');
+		// expect(sale.price).toEqual(price);
 	});
 
 	// test('alice approves a sale for CHEDDAR', async () => {
@@ -219,70 +219,56 @@ describe('deploy contract ' + contractName, () => {
 	// 	expect(bid.owner_id).toEqual(bobId);
 	// });
 
-	test('bob place higher price offer for nft with NEAR', async () => {
-		const token_id = tokenIds[0];
+	// test('bob place higher price offer for nft with NEAR', async () => {
+	// 	const token_id = tokenIds[0];
 
-		const offer_price = 5;
-		await bob.functionCall({
-			contractId: marketId,
-			methodName: 'offer',
-			args: {
-				nft_contract_id: nftId,
-				token_id
-			},
-			gas: GAS,
-			attachedDeposit: parseNearAmount(offer_price.toString())
-		});
-
-		const sale = await bob.viewFunction(marketId, 'get_sale', { nft_contract_token: nftId + DELIMETER + token_id });
-		
-		console.log(sale);
-		let bid = sale.bids[token_type1];
-		console.log(bid);
-		expect(bid.owner_id).toEqual(bobId);
-	});
-
-	// test('bob place bid for nft with CHEDDAR', async () => {
-	// 	const token_id = tokenIds[1];
-	// 	/// purchase = near deposit = sale.price -> nft_transfer -> royalties transfer near
-	// 	const offer_price = 20;
+	// 	const offer_price = 5;
 	// 	await bob.functionCall({
-	// 		contractId: fungibleId,
-	// 		methodName: 'ft_transfer_call',
+	// 		contractId: marketId,
+	// 		methodName: 'offer',
 	// 		args: {
-	// 			receiver_id: marketId,
-	// 			amount: offer_price.toString(),
-	// 			msg: JSON.stringify({ nft_contract_id, token_id }),
+	// 			nft_contract_id: nftId,
+	// 			token_id
 	// 		},
 	// 		gas: GAS,
-	// 		attachedDeposit: 1
+	// 		attachedDeposit: parseNearAmount(offer_price.toString())
 	// 	});
 
 	// 	const sale = await bob.viewFunction(marketId, 'get_sale', { nft_contract_token: nftId + DELIMETER + token_id });
 		
-	// 	console.log("sale", sale);
-	// 	// let bid = sale.bids[token_type2].pop();
-	// 	// console.log(bid);
-	// 	// expect(bid.owner_id).toEqual(bobId);
-	// 	// expect(bid.price).toEqual(offer_price.toString());
+	// 	console.log(sale);
+	// 	let bid = sale.bids[token_type1];
+	// 	console.log(bid);
+	// 	expect(bid.owner_id).toEqual(bobId);
 	// });
 
-	test('alice accept bid for NEAR', async () => {
-		const token_id = tokenIds[0];
+	// // test('bob place bid for nft with CHEDDAR', async () => {
+	// // 	const token_id = tokenIds[1];
+	// // 	/// purchase = near deposit = sale.price -> nft_transfer -> royalties transfer near
+	// // 	const offer_price = 20;
+	// // 	await bob.functionCall({
+	// // 		contractId: fungibleId,
+	// // 		methodName: 'ft_transfer_call',
+	// // 		args: {
+	// // 			receiver_id: marketId,
+	// // 			amount: offer_price.toString(),
+	// // 			msg: JSON.stringify({ nft_contract_id, token_id }),
+	// // 		},
+	// // 		gas: GAS,
+	// // 		attachedDeposit: 1
+	// // 	});
 
-		await alice.functionCall({
-			contractId: marketId,
-			methodName: 'accept_offer',
-			args: {
-				nft_contract_id: nftId,
-				token_id: token_id
-			},
-			gas: GAS,
-		});
-	});
+	// // 	const sale = await bob.viewFunction(marketId, 'get_sale', { nft_contract_token: nftId + DELIMETER + token_id });
+		
+	// // 	console.log("sale", sale);
+	// // 	// let bid = sale.bids[token_type2].pop();
+	// // 	// console.log(bid);
+	// // 	// expect(bid.owner_id).toEqual(bobId);
+	// // 	// expect(bid.price).toEqual(offer_price.toString());
+	// // });
 
-	// test('alice accept bid for CHEDDAR', async () => {
-	// 	const token_id = tokenIds[1];
+	// test('alice accept bid for NEAR', async () => {
+	// 	const token_id = tokenIds[0];
 
 	// 	await alice.functionCall({
 	// 		contractId: marketId,
@@ -295,16 +281,30 @@ describe('deploy contract ' + contractName, () => {
 	// 	});
 	// });
 
-	// test('bob withdraws storage', async () => {
-	// 	await bob.functionCall({
-	// 		contractId: marketId,
-	// 		methodName: 'storage_withdraw',
-	// 		args: {},
-	// 		gas: GAS,
-	// 		attachedDeposit: 1
-	// 	});
-	// 	const result = await contractAccount.viewFunction(marketId, 'storage_paid', { account_id: bobId });
-	// 	expect(result).toEqual('0');
-	// });
+	// // test('alice accept bid for CHEDDAR', async () => {
+	// // 	const token_id = tokenIds[1];
+
+	// // 	await alice.functionCall({
+	// // 		contractId: marketId,
+	// // 		methodName: 'accept_offer',
+	// // 		args: {
+	// // 			nft_contract_id: nftId,
+	// // 			token_id: token_id
+	// // 		},
+	// // 		gas: GAS,
+	// // 	});
+	// // });
+
+	// // test('bob withdraws storage', async () => {
+	// // 	await bob.functionCall({
+	// // 		contractId: marketId,
+	// // 		methodName: 'storage_withdraw',
+	// // 		args: {},
+	// // 		gas: GAS,
+	// // 		attachedDeposit: 1
+	// // 	});
+	// // 	const result = await contractAccount.viewFunction(marketId, 'storage_paid', { account_id: bobId });
+	// // 	expect(result).toEqual('0');
+	// // });
 
 });
