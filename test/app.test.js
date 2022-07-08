@@ -54,35 +54,35 @@ describe('deploy contract ' + contractName, () => {
 	const tokenIds = ['78', '176', '188'];
 
 	beforeAll(async () => {
-		/// some users
+		// /// some users
 		alice = await getAccount(aliceId);
 		bob = await getAccount(bobId);
 		storageMarket = parseNearAmount('0.01');
 		
-		// const market = getAccount(marketId);
-		// const marketAccountState = await market.state();
-		// console.log('\n\nstate:', marketAccountState, '\n\n');
-		// if (marketAccountState.code_hash === '11111111111111111111111111111111') {
-			marketAccount = await getAccount(marketId);
-			const marketContractBytes = fs.readFileSync('./out/main.wasm');
-			console.log('\n\n deploying marketAccount contractBytes:', marketContractBytes.length, '\n\n');
-			const newMarketArgs = {
-				owner_id: contractId,
-				bid_history_length: BID_HISTORY_LENGTH,
-			};
-			const actions = [
-				deployContract(marketContractBytes),
-				functionCall('new', newMarketArgs, GAS)
-			];
-			await marketAccount.signAndSendTransaction({ receiverId: marketId, actions });
-		// }
+		// // const market = getAccount(marketId);
+		// // const marketAccountState = await market.state();
+		// // console.log('\n\nstate:', marketAccountState, '\n\n');
+		// // if (marketAccountState.code_hash === '11111111111111111111111111111111') {
+		// 	marketAccount = await getAccount(marketId);
+		// 	const marketContractBytes = fs.readFileSync('./out/main.wasm');
+		// 	console.log('\n\n deploying marketAccount contractBytes:', marketContractBytes.length, '\n\n');
+		// 	const newMarketArgs = {
+		// 		owner_id: contractId,
+		// 		bid_history_length: BID_HISTORY_LENGTH,
+		// 	};
+		// 	const actions = [
+		// 		deployContract(marketContractBytes),
+		// 		functionCall('new', newMarketArgs, GAS)
+		// 	];
+		// 	await marketAccount.signAndSendTransaction({ receiverId: marketId, actions });
+		// // }
 	});
 
 	test('alice approves a sale for NEAR', async () => {
 		const token_id = tokenIds[0];
 		const token_type = token_type1;
 
-		await alice.functionCall({
+		await bob.functionCall({
 			contractId: marketId,
 			methodName: 'storage_deposit',
 			args: {},

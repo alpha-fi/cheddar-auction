@@ -166,7 +166,7 @@ export function Form() {
           value={contractType == "auction" ? method && snake(method) : "auction_method"}
           onSelected={newMethod => {
             if (method !== newMethod) {
-              navigate(`/auction/${newMethod}`);
+              navigate(`/marketplace/auction/${newMethod}`);
             }
           }}
         />

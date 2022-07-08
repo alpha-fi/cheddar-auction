@@ -52,23 +52,28 @@ export const Marketplace = () => {
     setTimeout(step, interval);
 
     function step() {
-        const nowTime = new Date().getTime();
+        const nowTime = (new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000)).getTime();
         const lefts: string[] = [];
         for(let i =0; i< nfts?.length!; i++)
         {
-            const end_at = nfts![i].sale.end_at;
-            const remaining = parseInt(end_at) - nowTime;
+            const end_at = nfts![i].sale?.end_at;
+            if(end_at)
+            {
+                const remaining = parseInt(end_at) - nowTime;
             
-            let left = "Ended"
-            if(remaining > 0){
-                const hours = Math.floor((remaining / (1000 * 60 * 60)) % 24);
-                const minutes = Math.floor((remaining / 1000 / 60) % 60);
-                const seconds =  Math.floor((remaining / 1000) % 60);
-        
-                left = hours + " Hours " + minutes + " Minutes " + seconds + " Seconds";
+                let left = "Ended"
+                if(remaining > 0){
+                    const days = Math.floor((remaining / (1000 * 60 * 60 * 24)));
+                    const hours = Math.floor((remaining / (1000 * 60 * 60)) % 24);
+                    const minutes = Math.floor((remaining / 1000 / 60) % 60);
+                    const seconds =  Math.floor((remaining / 1000) % 60);
+            
+                    if(days > 0) left = days + "Days " + hours + " Hours " + minutes + " Minutes " + seconds + " Seconds";
+                    else left = hours + " Hours " + minutes + " Minutes " + seconds + " Seconds";
+                }
+    
+                lefts.push(left);
             }
-
-            lefts.push(left);
         }
         setTimeLeft(lefts);
     }
@@ -106,10 +111,10 @@ export const Marketplace = () => {
                                         </div>
                                         <div>
                                             {
-                                                timeLeft && timeLeft![index] != "Ended" && (
+                                                timeLeft && timeLeft![index] != "Ended"  && (
                                                     nft.token.owner_id == Tenk?.account.accountId ? 
-                                                    (<button className="secondary" onClick={e=> navigate(`/marketplace/view/${nft.token.token_id}`)}>View Auction</button>) : 
-                                                    (<button className="secondary" onClick={e=> navigate(`/marketplace/placebid/${nft.token.token_id}`)}>Place Bid</button>)
+                                                    <button className="secondary" onClick={e=> navigate(`/marketplace/view/${nft.token.token_id}`)}>View Auction</button> : 
+                                                    <button className="secondary" onClick={e=> navigate(`/marketplace/placebid/${nft.token.token_id}`)}>Place Bid</button>
                                                 )
                                             }
                                         </div>

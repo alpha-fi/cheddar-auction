@@ -8,16 +8,15 @@ import {Bid, Sale} from "../../near/contracts/auction/index"
 import css from "../NFTDetail/NFTDetail.module.css"
 import { DELIMETER, TokenSale } from "../NFTs/NFTs";
 import * as nearAPI from 'near-api-js';
+import { nft_tokens } from "../NFTs/NFTs.module.css";
 const {
-	Contract, KeyPair, Account,
 	utils: { format: { parseNearAmount } },
-	transactions: { deployContract, functionCall },
 } = nearAPI;
 
 export const AuctionBid = () => {
     const { nftid } = useParams<{ nftid: string }>()
     const { Tenk } = useTenkNear();
-    const { Auction } = useAuctionNear();
+    const { Auction, signIn } = useAuctionNear();
 
     const [nft, setNFT] = useState<TokenSale>();
     const [price, setPrice] = useState<number>(1);
@@ -53,20 +52,25 @@ export const AuctionBid = () => {
     setTimeout(step, interval);
 
     function step() {
-        const nowTime = new Date().getTime();
+        const nowTime = (new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000)).getTime();
 
-        const end_at = nft!.sale.end_at;
-        const remaining = parseInt(end_at) - nowTime;
+        const end_at = nft?.sale?.end_at;
+        if(end_at) {
+            const remaining = parseInt(end_at) - nowTime;
         
-        let left = "Ended"
-        if(remaining > 0){
-            const hours = Math.floor((remaining / (1000 * 60 * 60)) % 24);
-            const minutes = Math.floor((remaining / 1000 / 60) % 60);
-            const seconds =  Math.floor((remaining / 1000) % 60);
+            let left = "Ended"
+            if(remaining > 0){
+                const days = Math.floor((remaining / (1000 * 60 * 60 * 24)));
+                const hours = Math.floor((remaining / (1000 * 60 * 60)) % 24);
+                const minutes = Math.floor((remaining / 1000 / 60) % 60);
+                const seconds =  Math.floor((remaining / 1000) % 60);
+        
+                if(days > 0) left = days + "Days " + hours + " Hours " + minutes + " Minutes " + seconds + " Seconds";
+                else left = hours + " Hours " + minutes + " Minutes " + seconds + " Seconds";
+            }
+            setTimeLeft(left);
     
-            left = hours + " Hours " + minutes + " Minutes " + seconds + " Seconds";
         }
-        setTimeLeft(left);
     }
 
     const getSaleForNFT = async(nftid: string) => {
@@ -74,20 +78,13 @@ export const AuctionBid = () => {
         const args = {nft_contract_token: nft_contract_token};
         console.log("args", args);
         const res: Sale = await Auction?.account.viewFunction(Auction.contractId, "get_sale", args, );
-
-        // const bids = new Map(Object.entries(res.bids));
-        // // const bid: Bid = bids.get('near')!;
-
-        // console.log("res.bids", bids.get("near").owner_id);
-        // if (bids instanceof Map) {
-        //     const result = bids.get('name');
-        //     console.log(result);
-        // }
         return res;
     }
 
+
+
     const placeBid = async() => {
-        if(nft?.sale.token_type == "near")
+        if(nft?.sale?.token_type == "near")
         {
             const args = {token_id: nft.token.token_id};
             const bid_price = parseNearAmount(price.toString());
@@ -100,43 +97,59 @@ export const AuctionBid = () => {
 
             console.log(res);
         } else {
+            const args = {token_id: nft?.token.token_id!, amount: price};
+            const options = {
+                gas: new BN("30000000000000"),
+                attachedDeposit: new BN(1)
+            }
 
+            const res = await Auction?.offer_cheddar(args, options);
         }
     }
 
     return (
-        <div>
+        <>
             <div>
-                <div className={css.nft_container}>
-                    <div className={css.nft_token}>
-                        <img alt="NFT" src={"https://bafybeibghcllcmurku7lxyg4wgxn2zsu5qqk7h4r6bmyhpztmyd564cx54.ipfs.nftstorage.link/" + nft?.token.metadata?.media}/>
-                    </div>
-                    <div className={css.nft_token}>
-                        <b className="title" style={{"padding": "10% 0"}}>Place Bid</b><br/><br/>
+                <div>
+                    <div className={css.nft_container}>
+                        <div className={css.nft_token}>
+                            <img alt="NFT" src={"https://bafybeibghcllcmurku7lxyg4wgxn2zsu5qqk7h4r6bmyhpztmyd564cx54.ipfs.nftstorage.link/" + nft?.token.metadata?.media}/>
+                        </div>
+                        <div className={css.nft_token}>
+                            <b className="title" style={{"padding": "10% 0"}}>Place Bid</b><br/><br/>
 
-                        <b className="title">Token ID: {nft?.token.token_id}</b><br/>
-                        <b className="title">Owner: {nft?.sale.owner_id}</b><br/>
-                        <b className="title">Description: {nft?.token.metadata?.description}</b><br/>
-                        <b className="title">Initial Price: {nft?.sale.price} {nft?.sale.token_type == "near" ? "NEAR": "CHEDDAR"}</b><br/>
-                        <b className="title">Remaining: {timeLeft}</b><br/><br/>
+                            <b className="title">Token ID: {nft?.token.token_id}</b><br/>
+                            <b className="title">Owner: {nft?.sale?.owner_id}</b><br/>
+                            <b className="title">Description: {nft?.token.metadata?.description}</b><br/>
+                            <b className="title">Initial Price: {nft?.sale?.price} {nft?.sale?.token_type == "near" ? "NEAR": "CHEDDAR"}</b><br/>
+                            <b className="title">Remaining: {timeLeft}</b><br/><br/>
 
-                        {
-                            nft?.sale.bids &&
-                            <>
-                                <b className="title">Bids</b><br/>
-                                <b className="title">Bid Owner: {(new Map(Object.entries(nft.sale.bids))).get("near").owner_id}</b><br/>
-                                <b className="title">Bid Price: {nft.sale.token_type == "near" ? ((new Map(Object.entries(nft.sale.bids))).get("near").price) / Math.pow(10, 24) + "NEAR" : ((new Map(Object.entries(nft.sale.bids))).get("near").price) / Math.pow(10, 24) + "CHEDDAR"}</b><br/>
-                            </>
-                        }
+                            {
+                                nft?.sale?.bids ?
+                                <>
+                                    <b className="title">Bids</b><br/>
+                                    <b className="title">Bid Owner: {(new Map(Object.entries(nft.sale.bids))).get("near").owner_id}</b><br/>
+                                    <b className="title">Bid Price: {nft.sale.token_type == "near" ? ((new Map(Object.entries(nft.sale.bids))).get("near").price) / Math.pow(10, 24) + "NEAR" : ((new Map(Object.entries(nft.sale.bids))).get("near").price) / Math.pow(10, 24) + "CHEDDAR"}</b><br/>
+                                </> :
+                                <>
+                                    <b className="title">No Bids</b><br/><br/>
+                                </>
+                            }
 
 
-                        <br/><b className="title">Price</b><br/>
-                        <input type="number" value={price.toString()} onChange={e => setPrice(parseFloat(e.target.value))}/><br/><br/>
-                        
-                        {timeLeft != "Ended" && (<button className="secondary" onClick={e => placeBid()}>Place Bid</button>)}
+                            <br/><b className="title">Price</b><br/>
+                            <input type="number" value={price.toString()} onChange={e => setPrice(parseFloat(e.target.value))}/><br/><br/>
+                            
+                            {timeLeft != "Ended" && Auction?.account.accountId && nft?.sale?.owner_id != Auction.account.accountId && (
+                                <button className="secondary" onClick={e => placeBid()}>Place Bid</button>
+                            )}
+                            {
+                                !Auction?.account.accountId && <button className="secondary" onClick={signIn}>Connect Wallet</button>
+                            }
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </>         
     )   
 }

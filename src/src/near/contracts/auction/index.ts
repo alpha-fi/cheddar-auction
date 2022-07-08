@@ -1,5 +1,5 @@
 import * as nearAPI from 'near-api-js';
-
+import { FT_CONTRACT_ACCOUNT } from '../../../components/Constants/Contracts';
 import {
   Account,
   transactions,
@@ -44,12 +44,24 @@ export class AuctionContract {
   * End public deposit storage, if no storage cant create auction.
   * @allow ["::owner"]
   */
-   async storage_deposit(args: {}, options?: ChangeMethodOptions): Promise<boolean> {
+   async storage_deposit(args: {account_id: AccountId}, options?: ChangeMethodOptions): Promise<boolean> {
     return providers.getTransactionLastResult(await this.storage_depositRaw(args, options));
   }
 
   storage_depositRaw(args: {}, options?: ChangeMethodOptions): Promise<providers.FinalExecutionOutcome> {
     return this.account.functionCall({contractId: this.contractId, methodName: "storage_deposit", args, ...options});
+  }
+
+  /**
+  * End public deposit storage, if no storage cant create auction.
+  * @allow ["::owner"]
+  */
+  async storage_withdraw(args: {}, options?: ChangeMethodOptions): Promise<boolean> {
+    return providers.getTransactionLastResult(await this.storage_depositRaw(args, options));
+  }
+
+  storage_withdrawRaw(args: {}, options?: ChangeMethodOptions): Promise<providers.FinalExecutionOutcome> {
+    return this.account.functionCall({contractId: this.contractId, methodName: "storage_withdraw", args, ...options});
   }
 
   /**
@@ -92,18 +104,27 @@ export class AuctionContract {
   */
    async offer(args: {token_id: TokenId}, options: ChangeMethodOptions): Promise<boolean> {
     const args_new = {token_id: args.token_id, nft_contract_id: this.nft_contract_id};
-    // const attached = options.attachedDeposit as BN;
-    // const options_new = {
-    //   gas: options?.gas,
-    //   attachedDeposit: attached.mul(new BN(Math.pow(10, 24))),
-    //   walletMeta: '',
-    //   walletCallbackUrl: ''
-    // }
     return providers.getTransactionLastResult(await this.offerRaw(args_new, options));
   }
 
   offerRaw(args: {}, options?: ChangeMethodOptions): Promise<providers.FinalExecutionOutcome> {
     return this.account.functionCall({contractId: this.contractId, methodName: "offer", args, ...options});
+  }
+
+    /**
+  * End public place offer to auction, attached Amount is price of offer
+  * @allow ["::owner"]
+  */
+  async offer_cheddar(args: {token_id: TokenId, amount: u64}, options: ChangeMethodOptions): Promise<boolean> {
+    const nft_contract_id = this.nft_contract_id;
+    const token_id = args.token_id;
+    const args_new = {receiver_id: this.contractId, amount:args.amount, msg: JSON.stringify({nft_contract_id, token_id})};
+
+    return providers.getTransactionLastResult(await this.offerRaw(args_new, options));
+  }
+
+  offer_cheddarRaw(args: {}, options?: ChangeMethodOptions): Promise<providers.FinalExecutionOutcome> {
+    return this.account.functionCall({contractId: FT_CONTRACT_ACCOUNT, methodName: "ft_transfer_call", args, ...options});
   }
 
     /**
@@ -156,6 +177,10 @@ export class AuctionContract {
     }
     return this.account.viewFunction(this.contractId, "get_sales_by_nft_contract_id", new_args, options)
   }
+
+  storage_balance_of(args: {account_id: AccountId}, options?: ViewFunctionOptions): Promise<U128>{
+    return this.account.viewFunction(this.contractId, "storage_balance_of", args, options);
+  }
 }
 
 export interface Sale {
@@ -167,7 +192,7 @@ export interface Sale {
   created_at: U128,
   end_at: U128,
   token_type: string,
-  bids: Object
+  bids?: Object
 }
 
 export interface Bid{
