@@ -21,7 +21,6 @@ export const NFTs = () => {
     const { Auction } = useAuctionNear();
 
     const [nfts, setNFTs] = useState<TokenSale[]>();
-    const [balance, setBalance] = useState<string>('0');
 
     // at first load, auto-submit if required arguments are fill in
     useEffect(() => {
@@ -48,7 +47,6 @@ export const NFTs = () => {
             }
         }
         getNFTs();
-        getStorageBalance();
     }, [Tenk])
 
     const getSaleForNFT = async(nftid: string) => {
@@ -61,12 +59,6 @@ export const NFTs = () => {
         return res;
     }
 
-    const getStorageBalance = async() => {
-        const args = {account_id: Auction?.account.accountId!};
-        const balance = await Auction?.storage_balance_of(args);
-        balance && setBalance((parseInt(balance) / Math.pow(10, 24)).toFixed(3));
-    }
-
     const goToDetail = (nftid: string): void =>  {
         navigate(`/myassets/asset/${nftid}`);
     };
@@ -75,10 +67,6 @@ export const NFTs = () => {
     return (
         <div style={{width: "100%", minHeight: "450px"}}>
             <div className="dlion">
-                <div style={{display: "flex"}}>
-                    <b className="title">Deposit Storage Balance: {balance}NEAR</b><br/>
-                    <button className="secondary" onClick={e=> navigate(`/myassets/storage`)}>Manage Storage</button>
-                </div>
                 <div>
                     {nfts && nfts?.length > 0 ? 
                         (                

@@ -82,34 +82,34 @@ describe('deploy contract ' + contractName, () => {
 		const token_id = tokenIds[0];
 		const token_type = token_type1;
 
-		await bob.functionCall({
-			contractId: marketId,
-			methodName: 'storage_deposit',
-			args: {},
+		// await bob.functionCall({
+		// 	contractId: marketId,
+		// 	methodName: 'storage_deposit',
+		// 	args: {},
+		// 	gas: GAS,
+		// 	attachedDeposit: parseNearAmount('0.1')
+		// });
+
+		const price = 1;
+		const period = 100000;
+
+		await alice.functionCall({
+			contractId: nftId,
+			methodName: 'nft_approve',
+			args: {
+				token_id,
+				account_id: marketId,
+				msg: JSON.stringify({ period, token_type, price, nft_contract_id })
+			},
 			gas: GAS,
-			attachedDeposit: parseNearAmount('0.1')
+			attachedDeposit: parseNearAmount('0.01')
 		});
 
-		// const price = 1;
-		// const period = 100000;
-
-		// await alice.functionCall({
-		// 	contractId: nftId,
-		// 	methodName: 'nft_approve',
-		// 	args: {
-		// 		token_id,
-		// 		account_id: marketId,
-		// 		msg: JSON.stringify({ period, token_type, price, nft_contract_id })
-		// 	},
-		// 	gas: GAS,
-		// 	attachedDeposit: parseNearAmount('0.01')
-		// });
-
-		// const sale = await alice.viewFunction(marketId, 'get_sale', {
-		// 	nft_contract_token: nftId + DELIMETER + token_id
-		// });
-		// console.log('\n\n get_sale result for nft', sale, '\n\n');
-		// expect(sale.price).toEqual(price);
+		const sale = await alice.viewFunction(marketId, 'get_sale', {
+			nft_contract_token: nftId + DELIMETER + token_id
+		});
+		console.log('\n\n get_sale result for nft', sale, '\n\n');
+		expect(sale.price).toEqual(price);
 	});
 
 	// test('alice approves a sale for CHEDDAR', async () => {

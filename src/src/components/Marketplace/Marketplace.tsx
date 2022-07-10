@@ -52,7 +52,8 @@ export const Marketplace = () => {
     setTimeout(step, interval);
 
     function step() {
-        const nowTime = (new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000)).getTime();
+        // const nowTime = (new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000)).getTime();
+        const nowTime = new Date().getTime();
         const lefts: string[] = [];
         for(let i =0; i< nfts?.length!; i++)
         {

@@ -69,7 +69,6 @@ export const AuctionBid = () => {
                 else left = hours + " Hours " + minutes + " Minutes " + seconds + " Seconds";
             }
             setTimeLeft(left);
-    
         }
     }
 

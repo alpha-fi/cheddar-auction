@@ -72,7 +72,7 @@ impl Contract {
         &mut self,
         contract_and_token_id: ContractAndTokenId,
         price: Balance,
-        ft_token_id: AccountId,
+        ft_token: AccountId,
         buyer_id: AccountId,
     ) {
         let mut sale = self.sales.get(&contract_and_token_id).expect("No sale");
@@ -90,7 +90,7 @@ impl Contract {
             price: U128(price),
         };
 
-        let current_bid = bids.get(&ft_token_id);
+        let current_bid = bids.get(&ft_token);
         if let Some(current_bid) = current_bid {
             // refund current bid holder
             let current_price: u128 = current_bid.price.into();
@@ -100,9 +100,9 @@ impl Contract {
                 current_price
             );
             Promise::new(current_bid.owner_id.clone()).transfer(current_bid.price.into());
-            bids.insert(ft_token_id, new_bid);
+            bids.insert(ft_token, new_bid);
         } else {
-            bids.insert(ft_token_id, new_bid);
+            bids.insert(ft_token, new_bid);
         }
         sale.bids = Some(bids);
         self.sales.insert(&contract_and_token_id, &sale);
@@ -117,17 +117,20 @@ impl Contract {
         let contract_and_token_id = format!("{}{}{}", contract_id.clone(), DELIMETER, token_id.clone());
         // remove bid before proceeding to process purchase
         let mut sale = self.sales.get(&contract_and_token_id).expect("No sale");
-        let ft_token_id = sale.token_type.clone();
+        let ft_token = sale.token_type.clone();
+
+        let seller_id = env::predecessor_account_id();
+        assert_eq!(sale.owner_id, seller_id, "Only owner of NFT can accept offer.");
         
         let mut bids = sale.bids.unwrap_or_default();
-        let bid = bids.remove(&ft_token_id).expect("No bid");
+        let bid = bids.remove(&ft_token).expect("No bid");
         sale.bids = Some(bids);
         self.sales.insert(&contract_and_token_id, &sale);
         // panics at `self.internal_remove_sale` and reverts above if predecessor is not sale.owner_id
         self.process_purchase(
             contract_id,
             token_id,
-            ft_token_id.into(),
+            ft_token.into(),
             bid.price,
             bid.owner_id.clone(),
         );

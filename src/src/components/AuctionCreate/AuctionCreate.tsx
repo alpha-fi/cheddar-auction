@@ -18,7 +18,6 @@ export const AuctionCreate = () => {
 
     const ft_cheddar = 'token-v3.cheddar.testnet';
 
-    const [balance, setBalance] = useState<string>('0');
     const [nft, setNFT] = useState<TokenSale>();
     const [price, setPrice] = useState<number>(1);
     const [ft, setFT] = useState<string>('NEAR');
@@ -27,14 +26,13 @@ export const AuctionCreate = () => {
 
     const onCreateAuction = async() => {
         const endTime = Math.round(new Date(endtime).getTime()) as u64;
-        var nowTime = (new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000)).getTime() as u64;
+        var nowTime = new Date().getTime() as u64;
         const period: u64 = endTime - nowTime;
 
         console.log(nowTime, endTime, period);
 
         if(period <= 0) {console.log("failed to set endTime!"); return;}
         if(price <= 0) {console.log("invalid price!"); return;}
-        if(parseInt(balance) <= 0) {console.log("deposit balance not enough!"); return;}
 
         const args = {
             token_id: parseInt(nft?.token.token_id!),
@@ -51,12 +49,6 @@ export const AuctionCreate = () => {
         
         await Auction?.create_auction(args, options);
         console.log("auction created");
-    }
-
-    const getStorageBalance = async() => {
-        const args = {account_id: Auction?.account.accountId!};
-        const balance = await Auction?.storage_balance_of(args);
-        balance && setBalance((parseInt(balance) / Math.pow(10, 24)).toFixed(3));
     }
 
     const getSaleForNFT = async(nftid: string) => {
@@ -91,7 +83,6 @@ export const AuctionCreate = () => {
             }
         }
         getNFTs();
-        getStorageBalance();
     }, [Tenk])
 
     return (
@@ -106,7 +97,6 @@ export const AuctionCreate = () => {
                         <div className={css.nft_token}>
                             <b className="title" style={{"padding": "10% 0"}}>Create Auction</b><br/><br/>
 
-                            <b className="title">Deposit Storage Balance: {balance}NEAR</b><br/>
                             <b className="title">Token ID: {nft?.token.token_id}</b><br/>
                             <b className="title">Description: {nft?.token.metadata?.description}</b><br/>
                             <b className="title">Status: {nft?.sale ? "On Auction" : "Not Auctioned"}</b><br/><br/>
