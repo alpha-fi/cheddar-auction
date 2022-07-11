@@ -55,8 +55,8 @@ export const AuctionView = () => {
     setTimeout(step, interval);
 
     function step() {
-        const nowTime = (new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000)).getTime();
-
+        // const nowTime = (new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000)).getTime();
+        const nowTime = new Date().getTime();
         if(status == NFT_STATUS.ONAUCTION && nft?.sale)
         {
             const end_at = nft.sale.end_at;

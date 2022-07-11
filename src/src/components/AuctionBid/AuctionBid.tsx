@@ -52,8 +52,8 @@ export const AuctionBid = () => {
     setTimeout(step, interval);
 
     function step() {
-        const nowTime = (new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000)).getTime();
-
+        // const nowTime = (new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000)).getTime();
+        const nowTime = new Date().getTime();
         const end_at = nft?.sale?.end_at;
         if(end_at) {
             const remaining = parseInt(end_at) - nowTime;

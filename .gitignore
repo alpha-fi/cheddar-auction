@@ -5,6 +5,7 @@
 /.pnp
 .pnp.js
 /out
+/src/node_modules
 
 #cache
 .cache
