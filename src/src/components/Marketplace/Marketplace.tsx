@@ -113,9 +113,13 @@ export const Marketplace = () => {
                                         <div>
                                             {
                                                 timeLeft && timeLeft![index] != "Ended"  && (
-                                                    nft.token.owner_id == Tenk?.account.accountId ? 
-                                                    <button className="secondary" onClick={e=> navigate(`/marketplace/view/${nft.token.token_id}`)}>View Auction</button> : 
+                                                    nft.token.owner_id != Tenk?.account.accountId &&
                                                     <button className="secondary" onClick={e=> navigate(`/marketplace/placebid/${nft.token.token_id}`)}>Place Bid</button>
+                                                )
+                                            }
+                                            {
+                                                timeLeft && timeLeft![index] == "Ended"  && (
+                                                    <button className="secondary" onClick={e=> navigate(`/marketplace/view/${nft.token.token_id}`)}>View Auction</button>
                                                 )
                                             }
                                         </div>

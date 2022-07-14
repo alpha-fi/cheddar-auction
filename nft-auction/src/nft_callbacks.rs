@@ -68,10 +68,8 @@ impl NonFungibleTokenApprovalsReceiver for Contract {
             }
 
             let contract_and_token_id = format!("{}{}{}", nft_contract_id, DELIMETER, token_id);
-            let mut price_new = price;
-            if token_type == "near" {
-                price_new = price * 1_000_000_000_000_000_000_000_000;
-            }
+            let price_real = price * 1_000_000_000_000_000_000_000_000;
+
             self.sales.insert(
                 &contract_and_token_id,
                 &Sale {
@@ -79,11 +77,11 @@ impl NonFungibleTokenApprovalsReceiver for Contract {
                     approval_id,
                     nft_contract_id: nft_contract_id.to_string(),
                     token_id: token_id.clone(),
-                    price: price_new,
+                    price: price_real,
                     created_at: U64(env::block_timestamp()/1000000),
                     end_at,
-                    token_type: token_type,
-                    bids: None,
+                    ft_token_type: token_type,
+                    bids: HashMap::new(),
                 },
             );
     

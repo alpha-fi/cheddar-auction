@@ -13,7 +13,6 @@ use std::collections::HashMap;
 use crate::external::*;
 use crate::internal::*;
 use crate::sale::*;
-use near_sdk::env::STORAGE_PRICE_PER_BYTE;
 
 mod external;
 mod ft_callbacks;
@@ -32,7 +31,6 @@ const GAS_FOR_ROYALTIES: Gas = 115_000_000_000_000;
 const GAS_FOR_NFT_TRANSFER: Gas = 15_000_000_000_000;
 const BID_HISTORY_LENGTH_DEFAULT: u8 = 1;
 const NO_DEPOSIT: Balance = 0;
-const STORAGE_PER_SALE: u128 = 1000 * STORAGE_PRICE_PER_BYTE;
 const FIVE_MINS : u64 = 5 * 60 * 1000;
 static DELIMETER: &str = "||";
 
@@ -41,6 +39,15 @@ pub type FungibleTokenId = AccountId;
 pub type ContractAndTokenId = String;
 // TODO: Capital U128
 pub type Payout = HashMap<AccountId, U128>;
+
+#[derive(Serialize, Deserialize)]
+#[serde(crate = "near_sdk::serde")]
+pub struct PayoutResult {
+    pub payout: Payout,
+    pub with_cheddar: Option<bool>,
+}
+
+
 #[derive(Serialize)]
 #[serde(crate = "near_sdk::serde")]
 pub struct StorageBalanceBounds {

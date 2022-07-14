@@ -22,7 +22,7 @@ impl FungibleTokenReceiver for Contract {
         assert_ne!(sale.owner_id, sender_id, "Cannot buy your own sale.");
 
         let ft_token = env::predecessor_account_id();
-        assert_eq!(sale.token_type, ft_token, "Cannot pay offer with this token.");
+        assert_eq!(sale.ft_token_type, ft_token, "Cannot pay offer with this token.");
 
         let price = sale.price;
 

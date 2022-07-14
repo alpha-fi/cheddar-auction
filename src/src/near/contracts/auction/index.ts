@@ -115,12 +115,12 @@ export class AuctionContract {
   * End public place offer to auction, attached Amount is price of offer
   * @allow ["::owner"]
   */
-  async offer_cheddar(args: {token_id: TokenId, amount: u64}, options: ChangeMethodOptions): Promise<boolean> {
+  async offer_cheddar(args: {token_id: TokenId, amount: string}, options: ChangeMethodOptions): Promise<boolean> {
     const nft_contract_id = this.nft_contract_id;
     const token_id = args.token_id;
-    const args_new = {receiver_id: this.contractId, amount:args.amount, msg: JSON.stringify({nft_contract_id, token_id})};
-
-    return providers.getTransactionLastResult(await this.offerRaw(args_new, options));
+    const args_new = {receiver_id: this.contractId, amount:args.amount.toString(), msg: JSON.stringify({nft_contract_id, token_id})};
+    console.log("arg_new: ", args_new);
+    return providers.getTransactionLastResult(await this.offer_cheddarRaw(args_new, options));
   }
 
   offer_cheddarRaw(args: {}, options?: ChangeMethodOptions): Promise<providers.FinalExecutionOutcome> {
@@ -138,6 +138,19 @@ export class AuctionContract {
 
   accept_offerRaw(args: {}, options?: ChangeMethodOptions): Promise<providers.FinalExecutionOutcome> {
     return this.account.functionCall({contractId: this.contractId, methodName: "accept_offer", args, ...options});
+  }
+
+   /**
+  * End public accept offer to auction
+  * @allow ["::owner"]
+  */
+  async claim_nft(args: {token_id: TokenId}, options: ChangeMethodOptions): Promise<boolean> {
+    const args_new = {token_id: args.token_id, nft_contract_id: this.nft_contract_id};
+    return providers.getTransactionLastResult(await this.claim_nftRaw(args_new, options));
+  }
+
+  claim_nftRaw(args: {}, options?: ChangeMethodOptions): Promise<providers.FinalExecutionOutcome> {
+    return this.account.functionCall({contractId: this.contractId, methodName: "claim_nft", args, ...options});
   }
 
       /**
@@ -191,8 +204,17 @@ export interface Sale {
   price: u64,
   created_at: U128,
   end_at: U128,
-  token_type: string,
-  bids?: Object
+  ft_token_type: string,
+  bids?: Map<String, Bid[]>
+}
+
+export interface SaleView {
+  bid_count?: Number,
+  bids?: Bid[],
+  created_at: U128,
+  price: u64,
+  end_at: U128,
+  ft_token_type: string
 }
 
 export interface Bid{

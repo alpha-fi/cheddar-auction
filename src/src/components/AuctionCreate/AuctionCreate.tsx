@@ -70,7 +70,7 @@ export const AuctionCreate = () => {
 
                 if(sale)
                 {
-                    if(sale.token_type == "near"){
+                    if(sale.ft_token_type == "near"){
                         sale.price = sale.price / Math.pow(10, 24);
                     }
                 }

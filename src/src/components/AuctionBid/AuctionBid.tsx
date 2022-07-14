@@ -4,14 +4,20 @@ import BN from 'bn.js';
 import useTenkNear from "../../hooks/useTenkNear"
 import useAuctionNear from "../../hooks/useAuctionNear";
 import {Token} from "../../near/contracts/tenk/index"
-import {Bid, Sale} from "../../near/contracts/auction/index"
+import {Bid, Sale, SaleView} from "../../near/contracts/auction/index"
 import css from "../NFTDetail/NFTDetail.module.css"
-import { DELIMETER, TokenSale } from "../NFTs/NFTs";
+import { DELIMETER } from "../NFTs/NFTs";
 import * as nearAPI from 'near-api-js';
 import { nft_tokens } from "../NFTs/NFTs.module.css";
+import { FT_CONTRACT_ACCOUNT } from "../Constants/Contracts";
 const {
 	utils: { format: { parseNearAmount } },
 } = nearAPI;
+
+interface TokenSale {
+    token: Token;
+    sale?: SaleView;
+}
 
 export const AuctionBid = () => {
     const { nftid } = useParams<{ nftid: string }>()
@@ -29,20 +35,27 @@ export const AuctionBid = () => {
             };
             const token: Token = await Tenk?.account.viewFunction(Tenk.contractId, "nft_token", args);
             if(token) {
-                let sale = await getSaleForNFT(token.token_id);
-
-                if(sale)
+                const sale = await getSaleForNFT(token.token_id);
+                if(sale.bids)
                 {
-                    if(sale.token_type == "near"){
-                        sale.price = sale.price / Math.pow(10, 24);
+                    console.log('bids: ', JSON.stringify(sale.bids));
+                    let bids = new Map(Object.entries(sale.bids));
+                    const sale_view: SaleView = {
+                        bids: bids.get(sale.ft_token_type),
+                        created_at: sale.created_at,
+                        end_at: sale.end_at,
+                        price: sale.price / Math.pow(10, 24),
+                        ft_token_type: sale.ft_token_type
                     }
+
+                    const token_sale = {
+                        token: token,
+                        sale: sale_view
+                    }
+                    setNFT(token_sale);
+                    console.log(nft);                    
                 }
-                const token_sale = {
-                    token: token,
-                    sale: sale
-                }
-                setNFT(token_sale);
-                console.log(token_sale);
+                else setNFT({token: token});
             }
         }
         getNFTs();
@@ -83,9 +96,9 @@ export const AuctionBid = () => {
 
 
     const placeBid = async() => {
-        if(nft?.sale?.token_type == "near")
+        if(nft?.sale?.ft_token_type == "near")
         {
-            const args = {token_id: nft.token.token_id};
+            const args = {token_id: nft.token.token_id, offer_price: price * Math.pow(10, 24)};
             const bid_price = parseNearAmount(price.toString());
             const options = {
                 gas: new BN("30000000000000"),
@@ -96,9 +109,9 @@ export const AuctionBid = () => {
 
             console.log(res);
         } else {
-            const args = {token_id: nft?.token.token_id!, amount: price};
+            const args = {token_id: nft?.token.token_id!, amount: parseNearAmount(price.toString())!};
             const options = {
-                gas: new BN("30000000000000"),
+                gas: new BN("50000000000000"),
                 attachedDeposit: new BN(1)
             }
 
@@ -115,36 +128,40 @@ export const AuctionBid = () => {
                             <img alt="NFT" src={"https://bafybeibghcllcmurku7lxyg4wgxn2zsu5qqk7h4r6bmyhpztmyd564cx54.ipfs.nftstorage.link/" + nft?.token.metadata?.media}/>
                         </div>
                         <div className={css.nft_token}>
-                            <b className="title" style={{"padding": "10% 0"}}>Place Bid</b><br/><br/>
+                            <>
+                                <b className="title" style={{"padding": "10% 0"}}>Place Bid</b><br/><br/>
+                                <b className="title">Token ID: {nft?.token.token_id}</b><br/>
+                                <b className="title">Owner: {nft?.token?.owner_id}</b><br/>
+                                <b className="title">Description: {nft?.token.metadata?.description}</b><br/>
+                                <b className="title">Initial Price: {nft?.sale?.price} {nft?.sale?.ft_token_type == "near" ? "NEAR": "CHEDDAR"}</b><br/>
+                                <b className="title">Remaining: {timeLeft}</b><br/><br/>
 
-                            <b className="title">Token ID: {nft?.token.token_id}</b><br/>
-                            <b className="title">Owner: {nft?.sale?.owner_id}</b><br/>
-                            <b className="title">Description: {nft?.token.metadata?.description}</b><br/>
-                            <b className="title">Initial Price: {nft?.sale?.price} {nft?.sale?.token_type == "near" ? "NEAR": "CHEDDAR"}</b><br/>
-                            <b className="title">Remaining: {timeLeft}</b><br/><br/>
-
-                            {
-                                nft?.sale?.bids ?
-                                <>
-                                    <b className="title">Bids</b><br/>
-                                    <b className="title">Bid Owner: {(new Map(Object.entries(nft.sale.bids))).get("near").owner_id}</b><br/>
-                                    <b className="title">Bid Price: {nft.sale.token_type == "near" ? ((new Map(Object.entries(nft.sale.bids))).get("near").price) / Math.pow(10, 24) + "NEAR" : ((new Map(Object.entries(nft.sale.bids))).get("near").price) / Math.pow(10, 24) + "CHEDDAR"}</b><br/>
-                                </> :
-                                <>
-                                    <b className="title">No Bids</b><br/><br/>
-                                </>
-                            }
+                                {
+                                    nft?.sale?.bids && 
+                                    <>
+                                        <b className="title">Bids</b><br/>
+                                        {nft.sale.bids.map(bid => {
+                                            return (
+                                                <>
+                                                    <b className="title">Bid Owner: {bid.owner_id}</b><br/>
+                                                    <b className="title">Bid Price: {parseInt(bid.price) / Math.pow(10, 24)} {nft.sale?.ft_token_type == "near" ? "NEAR" : "CHEDDAR"}</b><br/>
+                                                </>
+                                            )
+                                        })}
+                                    </>
+                                }
 
 
-                            <br/><b className="title">Price</b><br/>
-                            <input type="number" value={price.toString()} onChange={e => setPrice(parseFloat(e.target.value))}/><br/><br/>
-                            
-                            {timeLeft != "Ended" && Auction?.account.accountId && nft?.sale?.owner_id != Auction.account.accountId && (
-                                <button className="secondary" onClick={e => placeBid()}>Place Bid</button>
-                            )}
-                            {
-                                !Auction?.account.accountId && <button className="secondary" onClick={signIn}>Connect Wallet</button>
-                            }
+                                <br/><b className="title">Price</b><br/>
+                                <input type="number" value={price.toString()} onChange={e => setPrice(parseFloat(e.target.value))}/><br/><br/>
+
+                                {timeLeft != "Ended" && Auction?.account.accountId && nft?.token?.owner_id != Auction.account.accountId && (
+                                    <button className="secondary" onClick={e => placeBid()}>Place Bid</button>
+                                )}
+                                {
+                                    !Auction?.account.accountId && <button className="secondary" onClick={signIn}>Connect Wallet</button>
+                                }                            
+                            </>
                         </div>
                     </div>
                 </div>
