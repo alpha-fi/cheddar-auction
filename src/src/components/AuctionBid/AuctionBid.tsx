@@ -96,26 +96,36 @@ export const AuctionBid = () => {
 
 
     const placeBid = async() => {
-        if(nft?.sale?.ft_token_type == "near")
+        let current_price = nft?.sale?.price;
+        if(nft?.sale?.bids)
+            current_price = parseInt(nft.sale.bids[nft.sale.bids.length - 1].price);
+        
+        if(price <= current_price!)
         {
-            const args = {token_id: nft.token.token_id, offer_price: price * Math.pow(10, 24)};
-            const bid_price = parseNearAmount(price.toString());
-            const options = {
-                gas: new BN("30000000000000"),
-                attachedDeposit: new BN(bid_price!)
-            };
-
-            const res = await Auction?.offer(args, options);
-
-            console.log(res);
-        } else {
-            const args = {token_id: nft?.token.token_id!, amount: parseNearAmount(price.toString())!};
-            const options = {
-                gas: new BN("50000000000000"),
-                attachedDeposit: new BN(1)
+            console.log("You can place a bid with less price that current auction price.");
+        }
+        else {
+            if(nft?.sale?.ft_token_type == "near")
+            {
+                const args = {token_id: nft.token.token_id, offer_price: price * Math.pow(10, 24)};
+                const bid_price = parseNearAmount(price.toString());
+                const options = {
+                    gas: new BN("30000000000000"),
+                    attachedDeposit: new BN(bid_price!)
+                };
+    
+                const res = await Auction?.offer(args, options);
+    
+                console.log(res);
+            } else {
+                const args = {token_id: nft?.token.token_id!, amount: parseNearAmount(price.toString())!};
+                const options = {
+                    gas: new BN("50000000000000"),
+                    attachedDeposit: new BN(1)
+                }
+    
+                const res = await Auction?.offer_cheddar(args, options);
             }
-
-            const res = await Auction?.offer_cheddar(args, options);
         }
     }
 
@@ -129,22 +139,22 @@ export const AuctionBid = () => {
                         </div>
                         <div className={css.nft_token}>
                             <>
-                                <b className="title" style={{"padding": "10% 0"}}>Place Bid</b><br/><br/>
+                                <b className="title" style={{"padding": "10% 0", "fontSize": "18px"}}>Place Bid</b><br/><br/>
                                 <b className="title">Token ID: {nft?.token.token_id}</b><br/>
                                 <b className="title">Owner: {nft?.token?.owner_id}</b><br/>
                                 <b className="title">Description: {nft?.token.metadata?.description}</b><br/>
-                                <b className="title">Initial Price: {nft?.sale?.price} {nft?.sale?.ft_token_type == "near" ? "NEAR": "CHEDDAR"}</b><br/>
+                                <b className="title">Initial Price: {(nft?.sale?.price)?.toFixed(3)} {nft?.sale?.ft_token_type == "near" ? "NEAR": "CHEDDAR"}</b><br/>
                                 <b className="title">Remaining: {timeLeft}</b><br/><br/>
 
                                 {
                                     nft?.sale?.bids && 
                                     <>
-                                        <b className="title">Bids</b><br/>
+                                        <b className="title" style={{"padding": "10% 0", "fontSize": "18px"}}>Bids</b><br/>
                                         {nft.sale.bids.map(bid => {
                                             return (
                                                 <>
                                                     <b className="title">Bid Owner: {bid.owner_id}</b><br/>
-                                                    <b className="title">Bid Price: {parseInt(bid.price) / Math.pow(10, 24)} {nft.sale?.ft_token_type == "near" ? "NEAR" : "CHEDDAR"}</b><br/>
+                                                    <b className="title">Bid Price: {(parseInt(bid.price) / Math.pow(10, 24)).toFixed(3)} {nft.sale?.ft_token_type == "near" ? "NEAR" : "CHEDDAR"}</b><br/><br/>
                                                 </>
                                             )
                                         })}

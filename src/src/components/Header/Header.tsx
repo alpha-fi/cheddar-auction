@@ -38,8 +38,8 @@ export const Header = () => {
                     </div>
                     <div style={{display: "flex"}}>
                         {!isMarketplace() ? 
-                            <div className={css.header_tab} style={{borderBottom: "2px solid black", marginRight: "15px"}} onClick={e => navigate("/")}>My Assets</div> : 
-                            <div className={css.header_tab} style={{marginRight: "15px"}} onClick={e => navigate("/")}>My Assets</div>
+                            wallet && wallet.getAccountId() && <div className={css.header_tab} style={{borderBottom: "2px solid black", marginRight: "15px"}} onClick={e => navigate("/")}>My Assets</div> : 
+                            wallet && wallet.getAccountId() && <div className={css.header_tab} style={{marginRight: "15px"}} onClick={e => navigate("/")}>My Assets</div>
                         }
                         {wallet && (
                             wallet.getAccountId() ? (
