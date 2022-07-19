@@ -100,9 +100,10 @@ export const AuctionBid = () => {
         if(nft?.sale?.bids)
             current_price = parseInt(nft.sale.bids[nft.sale.bids.length - 1].price);
         
-        if(price <= current_price!)
+        if((price * Math.pow(10, 24)) <= current_price!)
         {
             console.log("You can place a bid with less price that current auction price.");
+            console.log(price, current_price);
         }
         else {
             if(nft?.sale?.ft_token_type == "near")
