@@ -10,6 +10,8 @@ import { DELIMETER } from "../NFTs/NFTs";
 import * as nearAPI from 'near-api-js';
 import { nft_tokens } from "../NFTs/NFTs.module.css";
 import { FT_CONTRACT_ACCOUNT } from "../Constants/Contracts";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 const {
 	utils: { format: { parseNearAmount } },
 } = nearAPI;
@@ -102,7 +104,8 @@ export const AuctionBid = () => {
         
         if((price * Math.pow(10, 24)) <= current_price!)
         {
-            console.log("You can place a bid with less price that current auction price.");
+            toast("You can place a bid with less price that current auction price.");
+            // console.log("You can place a bid with less price that current auction price.");
             console.log(price, current_price);
         }
         else {
@@ -177,6 +180,7 @@ export const AuctionBid = () => {
                     </div>
                 </div>
             </div>
+            <ToastContainer />
         </>         
     )   
 }

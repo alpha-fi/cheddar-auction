@@ -1,8 +1,8 @@
 
+import BN from 'bn.js';
 //@ts-ignore for ts-json-schema-generator
 export { Account, transactions, providers, DEFAULT_FUNCTION_CALL_GAS } from 'near-api-js';
 //@ts-ignore for ts-json-schema-generator
-import BN from 'bn.js';
 export {BN};
 
 export interface ChangeMethodOptions {

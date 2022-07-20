@@ -8,6 +8,8 @@ import {Sale} from "../../near/contracts/auction/index"
 import css from "../NFTDetail/NFTDetail.module.css"
 import { u64 } from "../../near/contracts/auction/helper";
 import { DELIMETER, TokenSale } from "../NFTs/NFTs";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export const AuctionCreate = () => {
     const navigate = useNavigate();
@@ -31,8 +33,15 @@ export const AuctionCreate = () => {
 
         console.log(nowTime, endTime, period);
 
-        if(period <= 0) {console.log("failed to set endTime!"); return;}
-        if(price <= 0) {console.log("invalid price!"); return;}
+        if(period <= 0) {
+            console.log("failed to set endTime!"); 
+            toast("failed to set endTime!");
+            return;}
+        if(price <= 0) {
+            console.log("invalid price!"); 
+            toast("invalid price!");
+            return;
+        }
 
         const args = {
             token_id: parseInt(nft?.token.token_id!),
@@ -120,7 +129,8 @@ export const AuctionCreate = () => {
                         </div>
                     </div>
                 </div>
-            </div>        
+            </div>
+            <ToastContainer/>
         </>:
         <>
             <div style={{width: "100%", minHeight: "450px"}}>
