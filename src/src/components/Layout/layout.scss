@@ -10,19 +10,19 @@ $tertiary: #aad055 !default;
 :root {
   --base-font-size: 14px;
   --sans: "Bubblegum";
-  --monospace: "Source Code Pro",monospace;
+  --monospace: "Source Code Pro", monospace;
   --fw-regular: 400;
   --fw-bold: 600;
   --fw-black: 900;
   --lh-headings: 1.1;
   --lh-copy: 1.5;
   --base-spacing: 0.5rem;
-  --spacing-xs: calc(var(--base-spacing)/2);
+  --spacing-xs: calc(var(--base-spacing) / 2);
   --spacing-s: var(--base-spacing);
-  --spacing-m: calc(var(--base-spacing)*2);
-  --spacing-l: calc(var(--base-spacing)*3);
-  --spacing-xl: calc(var(--base-spacing)*4);
-  --spacing-xxl: calc(var(--base-spacing)*5);
+  --spacing-m: calc(var(--base-spacing) * 2);
+  --spacing-l: calc(var(--base-spacing) * 3);
+  --spacing-xl: calc(var(--base-spacing) * 4);
+  --spacing-xxl: calc(var(--base-spacing) * 5);
   --header-height: 80px;
   --input-height: 48px;
   --input-height--small: 40px;
@@ -32,17 +32,26 @@ $tertiary: #aad055 !default;
   --accent: #ffd60b;
   --fg: var(--black);
   --bg: var(--white);
-  --gray-1: rgba(38,38,38,.1);
-  --gray-2: rgba(38,38,38,.2);
-  --gray-3: rgba(38,38,38,.3);
-  --gray-4: rgba(38,38,38,.4);
-  --gray-5: rgba(38,38,38,.5);
-  --gray-6: rgba(38,38,38,.6);
-  --gray-7: rgba(38,38,38,.7);
-  --gray-8: rgba(38,38,38,.8);
-  --gray-9: rgba(38,38,38,.9);
+  --gray-1: rgba(38, 38, 38, 0.1);
+  --gray-2: rgba(38, 38, 38, 0.2);
+  --gray-3: rgba(38, 38, 38, 0.3);
+  --gray-4: rgba(38, 38, 38, 0.4);
+  --gray-5: rgba(38, 38, 38, 0.5);
+  --gray-6: rgba(38, 38, 38, 0.6);
+  --gray-7: rgba(38, 38, 38, 0.7);
+  --gray-8: rgba(38, 38, 38, 0.8);
+  --gray-9: rgba(38, 38, 38, 0.9);
   --red: #fc5b5b;
   --br-small: 6px;
+}
+
+#root {
+  background: url("../../Assets/imgs/cheddar-farm-background.svg") top/contain
+    no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+  position: relative;
+  min-height: 100%;
 }
 
 html {
@@ -92,7 +101,8 @@ picture {
   max-width: 100%;
 }
 
-.link, a {
+.link,
+a {
   color: var(--accent);
   padding: 0;
   position: relative;
@@ -174,8 +184,8 @@ button,
   display: inline-block;
   font-size: inherit;
 }
-button[type=submit],
-.button[type=submit] {
+button[type="submit"],
+.button[type="submit"] {
   margin-top: var(--spacing-l);
 }
 
@@ -274,7 +284,7 @@ input::selection {
   margin: 0;
 }
 
-input[type=checkbox] {
+input[type="checkbox"] {
   margin-right: var(--spacing-xs);
 }
 
@@ -311,7 +321,8 @@ input[type=checkbox] {
   padding: 15px 10%;
 }
 
-.button.secondary, button.secondary {
+.button.secondary,
+button.secondary {
   background-color: transparent;
   border: 1px solid var(--gray-3);
   color: var(--fg);
