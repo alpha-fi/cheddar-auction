@@ -99,7 +99,7 @@ export const NFTs = () => {
             <>
               {nfts?.map((nft) => {
                 return (
-                  <div className={css.nft_token}>
+                  <div className={css.nft_token} key={nft.token.token_id}>
                     <img
                       alt="NFT"
                       src={
