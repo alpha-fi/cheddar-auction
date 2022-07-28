@@ -1,5 +1,5 @@
 .trigger {
-  background-color: var(--bg);
+  background-color: transparent;
   background-image: url(data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMTAwMCAxMDAwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPg0KICA8cGF0aCBmaWxsPSJncmF5IiBkPSJNMTAsMjMyLjdsNDkwLDUzNC41bDQ5MC01MzQuNUgxMHoiIC8+DQo8L3N2Zz4=);
   background-repeat: no-repeat;
   background-position: bottom 50% right var(--spacing-s);
@@ -47,10 +47,11 @@
 }
 
 .content {
-  background-color: var(--bg);
+  background-color: transparent;
   border-radius: var(--br-small);
   border: 1px solid var(--gray-4);
-  box-shadow: rgba(22, 23, 24, 0.35) 0px 10px 38px -10px, rgba(22, 23, 24, 0.2) 0px 10px 20px -15px;
+  box-shadow: rgba(22, 23, 24, 0.35) 0px 10px 38px -10px,
+    rgba(22, 23, 24, 0.2) 0px 10px 20px -15px;
   padding: var(--spacing-xs);
 }
 
