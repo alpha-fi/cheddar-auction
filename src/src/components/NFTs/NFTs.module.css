@@ -1,47 +1,71 @@
-.nft_header{
-    display: flex;
-    -webkit-box-align: center;
-    align-items: center;
-    -webkit-box-pack: start;
-    justify-content: flex-start;
+.nft_header {
+  display: flex;
+  -webkit-box-align: center;
+  align-items: center;
+  -webkit-box-pack: start;
+  justify-content: center;
 }
 
 .symbol {
-    width: 33px;
-    height: 33px;
-    display: flex;
-    -webkit-box-align: center;
-    align-items: center;
-    -webkit-box-pack: center;
-    justify-content: center;
-    overflow: hidden;
+  width: 33px;
+  height: 33px;
+  display: flex;
+  -webkit-box-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  justify-content: center;
+  overflow: hidden;
 }
 
 .desc {
-    display: flex;
-    -webkit-box-align: center;
-    align-items: center;
-    margin-left: 14px;
+  display: flex;
+  -webkit-box-align: center;
+  align-items: center;
+  margin-left: 14px;
+  margin-right: 14px;
+  border-radius: 6px;
+  padding: 1px 6px;
+  border: solid #2626264d 1px;
 }
 
-.nft_tokens{
-    display: flex;
-    flex-wrap: wrap;
-    max-width: 100%;
+.nft_tokens {
+  display: grid;
+  row-gap: 10px;
+  column-gap: 10px;
+  max-width: 100%;
+  grid-template-columns: 1fr;
 }
 
-.nft_token{
-    -webkit-box-flex: 1;
-    flex-grow: 1;
-    flex-basis: 50%;
-    max-width: 50%;
-    padding: 5%;
-    color: black;
-    cursor: pointer;
+.nft_token {
+  width: 100%;
+  padding: 5%;
+  color: black;
+  cursor: pointer;
+  background-color: #ebe7f5;
+  border-radius: 8px;
+  box-shadow: 0 0 3px #bbb;
 }
 
-.nft_token_info{
-    display: flex;
-    justify-content: space-between;
-    padding-top: 10px;
+.nft_token_info {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 10px;
+}
+
+@media (min-width: 576px) {
+  .nft_tokens {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .nft_tokens {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 992px) {
+  .nft_tokens {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
