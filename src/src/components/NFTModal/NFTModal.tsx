@@ -7,6 +7,7 @@ import { NFTDetail } from "../NFTDetail/NFTDetail";
 import { AuctionView } from "../AuctionView/AuctionView";
 import { AuctionBid } from "../AuctionBid/AuctionBid";
 import { AuctionCreate } from "../AuctionCreate/AuctionCreate";
+import Spinner from "../Spinner/Spinner";
 
 const overlayShow = keyframes({
   "0%": { opacity: 0 },
@@ -68,59 +69,54 @@ export const DialogTitle = StyledTitle;
 export const DialogDescription = StyledDescription;
 export const DialogClose = DialogPrimitive.Close;
 
-// Your app...
-const Flex = styled("div", { display: "flex" });
-const Box = styled("div", {});
-
 type Props = {
-  show: string;
-  setShow: React.Dispatch<React.SetStateAction<string>>;
-  tokenId: string;
-  setTokenId: React.Dispatch<React.SetStateAction<string>>;
+  show: { name: string; nftid: string; loading: boolean };
+  setShow: React.Dispatch<
+    React.SetStateAction<{ name: string; nftid: string; loading: boolean }>
+  >;
 };
 
-const NFTModal = ({ show, setShow, tokenId, setTokenId }: Props) => {
+const NFTModal = ({ show, setShow }: Props) => {
   const handleClose = () => {
     window.history.replaceState({}, "", `${window.location.pathname}`);
-    setShow("");
-  };
-
-  const fillError = (error: string) => {
-    switch (error) {
-      case "userRejected":
-        return "Transaction rejected by user";
-        break;
-
-      default:
-        return "Please try again";
-        break;
-    }
+    setShow({ name: "", nftid: "", loading: false });
   };
 
   return (
-    <Dialog open={show !== ""}>
-      <DialogContent>
-        <StyledOverlay />
-        <StyledContent>
-          {show === "NFTDetail" && <NFTDetail id={tokenId} />}
-          {show === "AuctionView" && <AuctionView id={tokenId} />}
-          {show === "AuctionBid" && <AuctionBid id={tokenId} />}
-          {show === "AuctionCreate" && <AuctionCreate id={tokenId} />}
-          <DialogClose
-            style={{
-              position: "absolute",
-              top: "10",
-              right: "10px",
-              cursor: "pointer",
-            }}
-            asChild
-            onClick={handleClose}
-          >
-            <Cross2Icon width="25px" height="25px" />
-          </DialogClose>
-        </StyledContent>
-      </DialogContent>
-    </Dialog>
+    <>
+      {show.loading && <Spinner />}
+      <Dialog open={show.name !== ""}>
+        <DialogContent>
+          <StyledOverlay />
+          <StyledContent>
+            {show.name === "NFTDetail" && (
+              <NFTDetail show={show} setShow={setShow} />
+            )}
+            {show.name === "AuctionView" && (
+              <AuctionView show={show} setShow={setShow} />
+            )}
+            {show.name === "AuctionBid" && (
+              <AuctionBid show={show} setShow={setShow} />
+            )}
+            {show.name === "AuctionCreate" && (
+              <AuctionCreate show={show} setShow={setShow} />
+            )}
+            <DialogClose
+              style={{
+                position: "absolute",
+                top: "10",
+                right: "10px",
+                cursor: "pointer",
+              }}
+              asChild
+              onClick={handleClose}
+            >
+              <Cross2Icon width="25px" height="25px" />
+            </DialogClose>
+          </StyledContent>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 

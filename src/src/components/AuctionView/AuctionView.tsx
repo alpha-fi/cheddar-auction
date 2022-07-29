@@ -16,10 +16,13 @@ interface TokenSale {
 }
 
 type Props = {
-  id: string;
+  show: { name: string; nftid: string; loading: boolean };
+  setShow: React.Dispatch<
+    React.SetStateAction<{ name: string; nftid: string; loading: boolean }>
+  >;
 };
 
-export const AuctionView = ({ id }: Props) => {
+export const AuctionView = ({ show, setShow }: Props) => {
   const enum NFT_STATUS {
     ONAUCTION,
     SALED,
@@ -27,11 +30,10 @@ export const AuctionView = ({ id }: Props) => {
   }
   const navigate = useNavigate();
 
-  const nftid = id; //useParams<{ nftid: string }>();
+  const { nftid } = show; //useParams<{ nftid: string }>();
   const { Tenk } = useTenkNear();
   const { Auction } = useAuctionNear();
 
-  const [imgLoad, setImgLoad] = useState(false);
   const [nft, setNFT] = useState<TokenSale>();
   const [loading, setLoading] = useState<boolean>(false);
   const [claimable, setClaimable] = useState<boolean>(false);
@@ -200,7 +202,12 @@ export const AuctionView = ({ id }: Props) => {
   };
 
   const handleImgOnLoad = () => {
-    setImgLoad(true);
+    setShow((prev) => {
+      return {
+        ...prev,
+        loading: false,
+      };
+    });
   };
 
   return Auction?.account ? (
@@ -209,7 +216,7 @@ export const AuctionView = ({ id }: Props) => {
         <div>
           <div
             className={css.nft_container}
-            style={{ display: imgLoad ? "flex" : "none" }}
+            style={{ display: show.loading ? "none" : "flex" }}
           >
             <div className={css.nft_token}>
               <img
@@ -240,7 +247,7 @@ export const AuctionView = ({ id }: Props) => {
               {nft?.sale && !loading && status == NFT_STATUS.ONAUCTION && (
                 <>
                   <b className="title">
-                    Initial Price: {(nft?.sale.price).toFixed(3)}
+                    Initial Price: {(nft?.sale.price).toFixed(2)}
                   </b>{" "}
                   {nft.sale?.ft_token_type == "near" ? "NEAR" : "CHEDDAR"}
                   <br />

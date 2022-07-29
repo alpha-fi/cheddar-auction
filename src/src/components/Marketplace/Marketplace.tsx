@@ -16,7 +16,11 @@ import { NFTDetail } from "../NFTDetail/NFTDetail";
 const ONE_DAY = 1000 * 60 * 60 * 24;
 
 export const Marketplace = () => {
-  const [showModal, setShowModal] = useState("");
+  const [showModal, setShowModal] = useState({
+    name: "",
+    nftid: "",
+    loading: false,
+  });
   const [tokenId, setTokenId] = useState("");
   const navigate = useNavigate();
 
@@ -113,7 +117,7 @@ export const Marketplace = () => {
   };
 
   const goToDetail = (name: string, nftid: string) => {
-    setShowModal(name); //navigate(`/myassets/asset/${nftid}`);
+    setShowModal({ name, nftid, loading: true }); //navigate(`/myassets/asset/${nftid}`);
     setTokenId(nftid);
   };
 
@@ -199,12 +203,7 @@ export const Marketplace = () => {
           </div>
         </div>
       </div>
-      <NFTModal
-        show={showModal}
-        setShow={setShowModal}
-        tokenId={tokenId}
-        setTokenId={setTokenId}
-      />
+      <NFTModal show={showModal} setShow={setShowModal} />
     </>
   );
 };

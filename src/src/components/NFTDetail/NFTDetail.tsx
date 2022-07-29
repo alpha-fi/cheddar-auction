@@ -3,25 +3,28 @@ import { useEffect, useState } from "react";
 import useTenkNear from "../../hooks/useTenkNear";
 import { Token } from "../../near/contracts/tenk/index";
 import css from "./NFTDetail.module.css";
+import Spinner from "../Spinner/Spinner";
 
 type Props = {
-  id: string;
+  show: { name: string; nftid: string; loading: boolean };
+  setShow: React.Dispatch<
+    React.SetStateAction<{ name: string; nftid: string; loading: boolean }>
+  >;
 };
 
-export const NFTDetail = ({ id }: Props) => {
+export const NFTDetail = ({ show, setShow }: Props) => {
   const { Tenk } = useTenkNear();
 
-  const [imgLoad, setImgLoad] = useState(false);
   const [nft, setNFT] = useState<Token>();
   // const [auction, setAuction] = useState<
   const method = "nft_token";
 
-  const nftid = id; //useParams<{ nftid: string }>();
+  const { nftid } = show; //useParams<{ nftid: string }>();
 
   useEffect(() => {
     const getNFTs = async () => {
       const args = {
-        token_id: id,
+        token_id: nftid,
       };
       const res: Token = await Tenk?.account.viewFunction(
         Tenk.contractId,
@@ -30,21 +33,26 @@ export const NFTDetail = ({ id }: Props) => {
       );
       if (res) {
         setNFT(res);
-        console.log(nft);
+        console.log(res);
       }
     };
     getNFTs();
   }, [Tenk]);
 
   const handleImgOnLoad = () => {
-    setImgLoad(true);
+    setShow((prev) => {
+      return {
+        ...prev,
+        loading: false,
+      };
+    });
   };
 
   return (
     <div>
       <div
         className={css.nft_container}
-        style={{ display: imgLoad ? "flex" : "none" }}
+        style={{ display: show.loading ? "none" : "flex" }}
       >
         <div className={css.nft_token}>
           <img

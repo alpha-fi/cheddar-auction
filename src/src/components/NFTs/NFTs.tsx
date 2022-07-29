@@ -25,7 +25,11 @@ export const NFTs = () => {
   const { Auction } = useAuctionNear();
 
   const [nfts, setNFTs] = useState<TokenSale[]>();
-  const [showModal, setShowModal] = useState("");
+  const [showModal, setShowModal] = useState({
+    name: "",
+    nftid: "",
+    loading: false,
+  });
   const [tokenId, setTokenId] = useState("");
 
   // at first load, auto-submit if required arguments are fill in
@@ -73,7 +77,7 @@ export const NFTs = () => {
   };
 
   const goToDetail = (name: string, nftid: string) => {
-    setShowModal(name); //navigate(`/myassets/asset/${nftid}`);
+    setShowModal({ name, nftid, loading: true }); //navigate(`/myassets/asset/${nftid}`);
     setTokenId(nftid);
   };
 
@@ -145,12 +149,7 @@ export const NFTs = () => {
           </div>
         </div>
       </div>
-      <NFTModal
-        show={showModal}
-        setShow={setShowModal}
-        tokenId={tokenId}
-        setTokenId={setTokenId}
-      />
+      <NFTModal show={showModal} setShow={setShowModal} />
     </>
   );
 };

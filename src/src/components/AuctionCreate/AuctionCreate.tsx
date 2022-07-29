@@ -17,19 +17,21 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 type Props = {
-  id: string;
+  show: { name: string; nftid: string; loading: boolean };
+  setShow: React.Dispatch<
+    React.SetStateAction<{ name: string; nftid: string; loading: boolean }>
+  >;
 };
 
-export const AuctionCreate = ({ id }: Props) => {
+export const AuctionCreate = ({ show, setShow }: Props) => {
   const navigate = useNavigate();
 
-  const nftid = id; //useParams<{ nftid: string }>();
+  const { nftid } = show; //useParams<{ nftid: string }>();
   const { Tenk } = useTenkNear();
   const { Auction } = useAuctionNear();
 
   const ft_cheddar = "token-v3.cheddar.testnet";
 
-  const [imgLoad, setImgLoad] = useState(false);
   const [nft, setNFT] = useState<TokenSale>();
   const [price, setPrice] = useState<number>(1);
   const [ft, setFT] = useState<string>("NEAR");
@@ -117,7 +119,12 @@ export const AuctionCreate = ({ id }: Props) => {
   }, [Tenk]);
 
   const handleImgOnLoad = () => {
-    setImgLoad(true);
+    setShow((prev) => {
+      return {
+        ...prev,
+        loading: false,
+      };
+    });
   };
 
   return Auction?.account ? (
@@ -126,7 +133,7 @@ export const AuctionCreate = ({ id }: Props) => {
         <div>
           <div
             className={css.nft_container}
-            style={{ display: imgLoad ? "flex" : "none" }}
+            style={{ display: show.loading ? "none" : "flex" }}
           >
             <div className={css.nft_token}>
               <img

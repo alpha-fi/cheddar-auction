@@ -24,11 +24,14 @@ interface TokenSale {
 }
 
 type Props = {
-  id: string;
+  show: { name: string; nftid: string; loading: boolean };
+  setShow: React.Dispatch<
+    React.SetStateAction<{ name: string; nftid: string; loading: boolean }>
+  >;
 };
 
-export const AuctionBid = ({ id }: Props) => {
-  const nftid = id; //useParams<{ nftid: string }>();
+export const AuctionBid = ({ show, setShow }: Props) => {
+  const { nftid } = show; //useParams<{ nftid: string }>();
   const { Tenk } = useTenkNear();
   const { Auction, signIn } = useAuctionNear();
 
@@ -161,13 +164,26 @@ export const AuctionBid = ({ id }: Props) => {
     }
   };
 
+  const handleImgOnLoad = () => {
+    setShow((prev) => {
+      return {
+        ...prev,
+        loading: false,
+      };
+    });
+  };
+
   return (
     <>
       <div>
         <div>
-          <div className={css.nft_container}>
+          <div
+            className={css.nft_container}
+            style={{ display: show.loading ? "none" : "flex" }}
+          >
             <div className={css.nft_token}>
               <img
+                onLoad={handleImgOnLoad}
                 alt="NFT"
                 src={
                   "https://bafybeibghcllcmurku7lxyg4wgxn2zsu5qqk7h4r6bmyhpztmyd564cx54.ipfs.nftstorage.link/" +
@@ -194,7 +210,7 @@ export const AuctionBid = ({ id }: Props) => {
                 </b>
                 <br />
                 <b className="title">
-                  Initial Price: {nft?.sale?.price?.toFixed(3)}{" "}
+                  Initial Price: {nft?.sale?.price?.toFixed(2)}{" "}
                   {nft?.sale?.ft_token_type == "near" ? "NEAR" : "CHEDDAR"}
                 </b>
                 <br />
