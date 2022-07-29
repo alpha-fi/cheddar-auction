@@ -15,7 +15,11 @@ interface TokenSale {
   sale?: SaleView;
 }
 
-export const AuctionView = () => {
+type Props = {
+  id: string;
+};
+
+export const AuctionView = ({ id }: Props) => {
   const enum NFT_STATUS {
     ONAUCTION,
     SALED,
@@ -23,10 +27,11 @@ export const AuctionView = () => {
   }
   const navigate = useNavigate();
 
-  const { nftid } = useParams<{ nftid: string }>();
+  const nftid = id; //useParams<{ nftid: string }>();
   const { Tenk } = useTenkNear();
   const { Auction } = useAuctionNear();
 
+  const [imgLoad, setImgLoad] = useState(false);
   const [nft, setNFT] = useState<TokenSale>();
   const [loading, setLoading] = useState<boolean>(false);
   const [claimable, setClaimable] = useState<boolean>(false);
@@ -194,13 +199,21 @@ export const AuctionView = () => {
     console.log(res);
   };
 
+  const handleImgOnLoad = () => {
+    setImgLoad(true);
+  };
+
   return Auction?.account ? (
     <>
       <div>
         <div>
-          <div className={css.nft_container}>
+          <div
+            className={css.nft_container}
+            style={{ display: imgLoad ? "flex" : "none" }}
+          >
             <div className={css.nft_token}>
               <img
+                onLoad={handleImgOnLoad}
                 alt="NFT"
                 src={
                   "https://bafybeibghcllcmurku7lxyg4wgxn2zsu5qqk7h4r6bmyhpztmyd564cx54.ipfs.nftstorage.link/" +
@@ -208,7 +221,7 @@ export const AuctionView = () => {
                 }
               />
             </div>
-            <div className={css.nft_token}>
+            <div className={css.nft_description}>
               <b
                 className="title"
                 style={{ padding: "10% 0", fontSize: "18px" }}

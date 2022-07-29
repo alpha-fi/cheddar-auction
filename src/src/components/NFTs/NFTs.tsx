@@ -9,6 +9,7 @@ import {
   AUCTION_CONTRACT_ACCOUNT,
   TENK_CONTRACT_ACCOUNT,
 } from "../Constants/Contracts";
+import NFTModal from "../NFTModal/NFTModal";
 
 export const DELIMETER = "||";
 
@@ -24,6 +25,8 @@ export const NFTs = () => {
   const { Auction } = useAuctionNear();
 
   const [nfts, setNFTs] = useState<TokenSale[]>();
+  const [showModal, setShowModal] = useState("");
+  const [tokenId, setTokenId] = useState("");
 
   // at first load, auto-submit if required arguments are fill in
   useEffect(() => {
@@ -69,8 +72,9 @@ export const NFTs = () => {
     return res;
   };
 
-  const goToDetail = (nftid: string): void => {
-    navigate(`/myassets/asset/${nftid}`);
+  const goToDetail = (name: string, nftid: string) => {
+    setShowModal(name); //navigate(`/myassets/asset/${nftid}`);
+    setTokenId(nftid);
   };
 
   console.log(nfts);
@@ -106,24 +110,28 @@ export const NFTs = () => {
                         "https://bafybeibghcllcmurku7lxyg4wgxn2zsu5qqk7h4r6bmyhpztmyd564cx54.ipfs.nftstorage.link/" +
                         nft.token.metadata?.media
                       }
-                      onClick={(e) => goToDetail(nft.token.token_id)}
+                      onClick={(e) =>
+                        goToDetail("NFTDetail", nft.token.token_id)
+                      }
                     />
                     <div className={css.nft_token_info}>
                       <b className="title">NFT Id:{nft.token.token_id}</b>
                       {nft.sale ? (
                         <button
-                          className="secondary"
-                          onClick={(e) =>
-                            navigate(`/marketplace/view/${nft.token.token_id}`)
+                          style={{ color: "#ffd60b" }}
+                          className="dark"
+                          onClick={() =>
+                            goToDetail("AuctionView", nft.token.token_id)
                           }
                         >
                           View Auction
                         </button>
                       ) : (
                         <button
-                          className="secondary"
-                          onClick={(e) =>
-                            navigate(`/myassets/auction/${nft.token.token_id}`)
+                          style={{ color: "#ffd60b" }}
+                          className="dark"
+                          onClick={() =>
+                            goToDetail("AuctionCreate", nft.token.token_id)
                           }
                         >
                           Create Auction
@@ -137,6 +145,12 @@ export const NFTs = () => {
           </div>
         </div>
       </div>
+      <NFTModal
+        show={showModal}
+        setShow={setShowModal}
+        tokenId={tokenId}
+        setTokenId={setTokenId}
+      />
     </>
   );
 };

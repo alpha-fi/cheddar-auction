@@ -23,8 +23,12 @@ interface TokenSale {
   sale?: SaleView;
 }
 
-export const AuctionBid = () => {
-  const { nftid } = useParams<{ nftid: string }>();
+type Props = {
+  id: string;
+};
+
+export const AuctionBid = ({ id }: Props) => {
+  const nftid = id; //useParams<{ nftid: string }>();
   const { Tenk } = useTenkNear();
   const { Auction, signIn } = useAuctionNear();
 
@@ -171,7 +175,7 @@ export const AuctionBid = () => {
                 }
               />
             </div>
-            <div className={css.nft_token}>
+            <div className={css.nft_description}>
               <>
                 <b
                   className="title"

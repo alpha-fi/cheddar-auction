@@ -10,10 +10,14 @@ import {
   AUCTION_CONTRACT_ACCOUNT,
   TENK_CONTRACT_ACCOUNT,
 } from "../Constants/Contracts";
+import NFTModal from "../NFTModal/NFTModal";
+import { NFTDetail } from "../NFTDetail/NFTDetail";
 
 const ONE_DAY = 1000 * 60 * 60 * 24;
 
 export const Marketplace = () => {
+  const [showModal, setShowModal] = useState("");
+  const [tokenId, setTokenId] = useState("");
   const navigate = useNavigate();
 
   const { Tenk } = useTenkNear();
@@ -108,8 +112,9 @@ export const Marketplace = () => {
     return res;
   };
 
-  const goToDetail = (nftid: string) => {
-    navigate(`/myassets/asset/${nftid}`);
+  const goToDetail = (name: string, nftid: string) => {
+    setShowModal(name); //navigate(`/myassets/asset/${nftid}`);
+    setTokenId(nftid);
   };
 
   return (
@@ -139,7 +144,9 @@ export const Marketplace = () => {
                         "https://bafybeibghcllcmurku7lxyg4wgxn2zsu5qqk7h4r6bmyhpztmyd564cx54.ipfs.nftstorage.link/" +
                         nft.token.metadata?.media
                       }
-                      onClick={(e) => goToDetail(nft.token.token_id)}
+                      onClick={(e) =>
+                        goToDetail("NFTDetail", nft.token.token_id)
+                      }
                     />
                     <div className={css.nft_token_info}>
                       <div style={{ display: "flex" }}>
@@ -158,28 +165,30 @@ export const Marketplace = () => {
                         {timeLeft &&
                           timeLeft![index] != "Ended" &&
                           nft.token.owner_id != Tenk?.account.accountId && (
-                            <button
-                              className="secondary"
-                              onClick={(e) =>
-                                navigate(
-                                  `/marketplace/placebid/${nft.token.token_id}`
-                                )
-                              }
-                            >
-                              Place Bid
-                            </button>
+                            <div style={{ alignSelf: "flex-end" }}>
+                              <button
+                                style={{ color: "#ffd60b" }}
+                                className="dark"
+                                onClick={() =>
+                                  goToDetail("AuctionBid", nft.token.token_id)
+                                }
+                              >
+                                Place Bid
+                              </button>
+                            </div>
                           )}
                         {timeLeft && timeLeft![index] == "Ended" && (
-                          <button
-                            className="secondary"
-                            onClick={(e) =>
-                              navigate(
-                                `/marketplace/view/${nft.token.token_id}`
-                              )
-                            }
-                          >
-                            View Auction
-                          </button>
+                          <div style={{ alignSelf: "flex-end" }}>
+                            <button
+                              style={{ color: "#ffd60b" }}
+                              className="dark"
+                              onClick={() =>
+                                goToDetail("AuctionView", nft.token.token_id)
+                              }
+                            >
+                              View Auction
+                            </button>
+                          </div>
                         )}
                       </div>
                     </div>
@@ -190,6 +199,12 @@ export const Marketplace = () => {
           </div>
         </div>
       </div>
+      <NFTModal
+        show={showModal}
+        setShow={setShowModal}
+        tokenId={tokenId}
+        setTokenId={setTokenId}
+      />
     </>
   );
 };
