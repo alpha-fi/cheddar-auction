@@ -3,6 +3,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import css from "./Header.module.css";
 import useNear from "../../hooks/useTenkNear";
 import { Dropdown } from "../Dropdown/Dropdown";
+import { HamburgerMenu } from "../HamburgerMenu/HamburguerMenu";
+import useScreenSize from "../../hooks/useScreenSize";
 
 export const Header = () => {
   let navigate = useNavigate();
@@ -16,6 +18,10 @@ export const Header = () => {
     console.log("currentPath", currentPath, currentPath.split("/"));
     if (currentPath.split("/")[1] == "marketplace") return true;
   };
+
+  const { width } = useScreenSize();
+
+  const hamburgerBreakpoint = 576;
 
   return (
     <nav className={css.header}>
@@ -66,39 +72,44 @@ export const Header = () => {
               </svg>
             </a>
           </div>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-            }}
-          >
+          {width >= hamburgerBreakpoint && (
             <div
-              className={css.header_tab}
-              style={isMarketplace() ? { borderBottom: "2px solid black" } : {}}
-              onClick={(e) => navigate("/marketplace")}
+              style={{
+                display: "flex",
+                justifyContent: "center",
+              }}
             >
-              Marketplace
-            </div>
-            {wallet && wallet.getAccountId() && (
               <div
                 className={css.header_tab}
-                style={{
-                  borderBottom: !isMarketplace() ? "2px solid black" : "",
-                  marginRight: "15px",
-                }}
-                onClick={(e) => navigate("/")}
+                style={
+                  isMarketplace() ? { borderBottom: "2px solid black" } : {}
+                }
+                onClick={(e) => navigate("/marketplace")}
               >
-                My&nbsp;Assets
+                Marketplace
               </div>
-            )}
-          </div>
+              {wallet && wallet.getAccountId() && (
+                <div
+                  className={css.header_tab}
+                  style={{
+                    borderBottom: !isMarketplace() ? "2px solid black" : "",
+                    marginRight: "15px",
+                  }}
+                  onClick={(e) => navigate("/")}
+                >
+                  My&nbsp;Assets
+                </div>
+              )}
+            </div>
+          )}
           <div
             style={{
               display: "flex",
               justifyContent: "end",
             }}
           >
-            {wallet &&
+            {width >= hamburgerBreakpoint &&
+              wallet &&
               (wallet.getAccountId() ? (
                 <Dropdown
                   trigger={
@@ -114,11 +125,22 @@ export const Header = () => {
                   ]}
                 />
               ) : (
-                <button className="secondary" onClick={signIn}>
+                <button className="yellow" onClick={signIn}>
                   Sign In
                 </button>
               ))}
           </div>
+          {width < hamburgerBreakpoint && (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "end",
+              }}
+            >
+              {" "}
+              <HamburgerMenu />
+            </div>
+          )}
         </div>
       </div>
     </nav>

@@ -27,9 +27,9 @@ export const Dropdown: React.FC<
             ))
           : Object.entries(items).map(([label, subItems]) => (
               <DropdownMenu.Root key={label}>
-                <DropdownMenu.TriggerItem className={css.item}>
+                <DropdownMenu.SubTrigger className={css.item}>
                   {label} →
-                </DropdownMenu.TriggerItem>
+                </DropdownMenu.SubTrigger>
                 <DropdownMenu.Content className={css.content}>
                   {subItems.map(({ className, ...props }, i) => (
                     <DropdownMenu.Item
