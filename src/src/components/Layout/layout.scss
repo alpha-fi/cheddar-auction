@@ -8,7 +8,7 @@ $secondary: #a463b0 !default;
 $tertiary: #aad055 !default;
 
 :root {
-  --base-font-size: 14px;
+  --base-font-size: 16px;
   --sans: "Bubblegum";
   --monospace: "Source Code Pro", monospace;
   --fw-regular: 400;
@@ -103,7 +103,7 @@ picture {
 
 .link,
 a {
-  color: var(--accent);
+  color: #333;
   padding: 0;
   position: relative;
   text-decoration: none;
@@ -201,8 +201,8 @@ input,
 select,
 button,
 .button {
-  // padding: var(--spacing-s) var(--spacing-m);
-  margin-bottom: var(--spacing-xs);
+  //padding: var(--spacing-s) var(--spacing-m);
+  margin-bottom: 0; // var(--spacing-xs);;
 }
 
 button:hover,
@@ -210,9 +210,9 @@ button:hover,
 button:focus,
 .button:focus {
   box-shadow: 0 0 10px 4px var(--gray-2);
-  position: relative;
+  //position: relative;
   text-decoration: none;
-  top: -1px;
+  //top: -1px;
 }
 button:active,
 .button:active {
@@ -267,7 +267,7 @@ input::selection {
 .container {
   margin-left: auto;
   margin-right: auto;
-  max-width: calc(75 * var(--spacing-m));
+  max-width: 1200px; //calc(75 * var(--spacing-m));
   padding-left: var(--spacing-l);
   padding-right: var(--spacing-l);
 }
@@ -318,7 +318,7 @@ input[type="checkbox"] {
   -webkit-box-pack: start;
   justify-content: flex-start;
   flex-direction: column;
-  padding: 15px 10%;
+  padding: 15px 0px;
 }
 
 .button.secondary,
@@ -326,4 +326,10 @@ button.secondary {
   background-color: transparent;
   border: 1px solid var(--gray-3);
   color: var(--fg);
+}
+
+.button.purple,
+button.purple {
+  background-color: #8542eb;
+  color: white;
 }

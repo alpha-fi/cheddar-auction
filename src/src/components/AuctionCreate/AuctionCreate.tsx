@@ -192,14 +192,11 @@ export const AuctionCreate = ({ show, setShow }: Props) => {
               <br />
 
               {nft?.sale ? (
-                <button className="secondary" onClick={(e) => navigate("/")}>
+                <button className="purple" onClick={(e) => navigate("/")}>
                   Return
                 </button>
               ) : (
-                <button
-                  className="secondary"
-                  onClick={(e) => onCreateAuction()}
-                >
+                <button className="purple" onClick={(e) => onCreateAuction()}>
                   Create
                 </button>
               )}

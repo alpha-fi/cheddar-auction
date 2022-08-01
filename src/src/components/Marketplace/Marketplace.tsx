@@ -135,7 +135,7 @@ export const Marketplace = () => {
           </a>
         </div>
       </div>
-      <div style={{ width: "100%", minHeight: "450px" }}>
+      <div className="container">
         <div className="dlion">
           <div className={css.nft_tokens}>
             <>
@@ -171,8 +171,7 @@ export const Marketplace = () => {
                           nft.token.owner_id != Tenk?.account.accountId && (
                             <div style={{ alignSelf: "flex-end" }}>
                               <button
-                                style={{ color: "#ffd60b" }}
-                                className="dark"
+                                className="purple"
                                 onClick={() =>
                                   goToDetail("AuctionBid", nft.token.token_id)
                                 }
@@ -184,8 +183,7 @@ export const Marketplace = () => {
                         {timeLeft && timeLeft![index] == "Ended" && (
                           <div style={{ alignSelf: "flex-end" }}>
                             <button
-                              style={{ color: "#ffd60b" }}
-                              className="dark"
+                              className="purple"
                               onClick={() =>
                                 goToDetail("AuctionView", nft.token.token_id)
                               }

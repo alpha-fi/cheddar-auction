@@ -1,6 +1,6 @@
 .header {
   background-color: var(--gray-1);
-  margin-bottom: var(--spacing-l);
+  margin-bottom: var(--spacing-m);
   padding: var(--spacing-m) 0;
 }
 
@@ -14,10 +14,9 @@
 
 .header_container_content {
   align-items: center;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-m);
-  justify-content: space-between;
+  display: grid;
+  gap: var(--spacing-xs);
+  grid-template-columns: 1fr 2fr 1fr;
   width: 100%;
 }
 
@@ -34,7 +33,10 @@
 }
 
 .header_tab {
-  padding: 0 10px;
-  line-height: 2;
+  margin: 0 10px;
   cursor: pointer;
+}
+
+a {
+  align-self: center;
 }

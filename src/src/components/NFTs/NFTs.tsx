@@ -100,7 +100,7 @@ export const NFTs = () => {
       ) : (
         <div style={{ display: "flex", justifyContent: "center" }}>No NFTs</div>
       )}
-      <div style={{ width: "100%", minHeight: "450px" }}>
+      <div className="container">
         <div className="dlion">
           <div></div>
           <div className={css.nft_tokens}>
@@ -122,8 +122,7 @@ export const NFTs = () => {
                       <b className="title">NFT Id:{nft.token.token_id}</b>
                       {nft.sale ? (
                         <button
-                          style={{ color: "#ffd60b" }}
-                          className="dark"
+                          className="purple"
                           onClick={() =>
                             goToDetail("AuctionView", nft.token.token_id)
                           }
@@ -132,8 +131,7 @@ export const NFTs = () => {
                         </button>
                       ) : (
                         <button
-                          style={{ color: "#ffd60b" }}
-                          className="dark"
+                          className="purple"
                           onClick={() =>
                             goToDetail("AuctionCreate", nft.token.token_id)
                           }

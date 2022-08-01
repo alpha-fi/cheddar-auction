@@ -290,7 +290,7 @@ export const AuctionView = ({ show, setShow }: Props) => {
                 <>
                   <b className="title">SALED</b>
                   <br />
-                  <button className="secondary" onClick={(e) => navigate("/")}>
+                  <button className="purple" onClick={(e) => navigate("/")}>
                     RETURN
                   </button>
                   <br />
@@ -302,26 +302,20 @@ export const AuctionView = ({ show, setShow }: Props) => {
                   {nft.sale.bids && (
                     <>
                       <br />
-                      <button
-                        className="secondary"
-                        onClick={(e) => acceptBid()}
-                      >
+                      <button className="purple" onClick={(e) => acceptBid()}>
                         Accept Bid
                       </button>
                       <br />
                     </>
                   )}
-                  <button
-                    className="secondary"
-                    onClick={(e) => cancelAuction()}
-                  >
+                  <button className="purple" onClick={(e) => cancelAuction()}>
                     Cancel Auction
                   </button>
                 </>
               )}
               {claimable && (
                 <>
-                  <button className="secondary" onClick={(e) => claimNFT()}>
+                  <button className="purple" onClick={(e) => claimNFT()}>
                     Claim NFT
                   </button>
                 </>

@@ -263,12 +263,12 @@ export const AuctionBid = ({ show, setShow }: Props) => {
                 {timeLeft != "Ended" &&
                   Auction?.account.accountId &&
                   nft?.token?.owner_id != Auction.account.accountId && (
-                    <button className="secondary" onClick={(e) => placeBid()}>
+                    <button className="purple" onClick={(e) => placeBid()}>
                       Place Bid
                     </button>
                   )}
                 {!Auction?.account.accountId && (
-                  <button className="secondary" onClick={signIn}>
+                  <button className="purple" onClick={signIn}>
                     Connect Wallet
                   </button>
                 )}

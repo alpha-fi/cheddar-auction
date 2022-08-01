@@ -24,6 +24,7 @@
   margin-left: 14px;
   margin-right: 14px;
   border-radius: 6px;
+  background-color: #ffd262;
   padding: 1px 6px;
   border: solid #2626264d 1px;
 }
@@ -67,5 +68,11 @@
 @media (min-width: 992px) {
   .nft_tokens {
     grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 1200px) {
+  .nft_tokens {
+    grid-template-columns: repeat(5, 1fr);
   }
 }
