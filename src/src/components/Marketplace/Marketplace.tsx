@@ -1,17 +1,9 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import css from "../NFTs/NFTs.module.css";
 import useTenkNear from "../../hooks/useTenkNear";
 import useAuctionNear from "../../hooks/useAuctionNear";
-import { TenkContract, Token } from "../../near/contracts/tenk/index";
-import { Sale } from "../../near/contracts/auction/index";
-import { TokenSale, DELIMETER } from "../NFTs/NFTs";
-import {
-  AUCTION_CONTRACT_ACCOUNT,
-  TENK_CONTRACT_ACCOUNT,
-} from "../Constants/Contracts";
 import NFTModal from "../NFTModal/NFTModal";
-import { NFTDetail } from "../NFTDetail/NFTDetail";
+import { useSaleNFTs } from "../../hooks/useSaleNFTs";
 
 const ONE_DAY = 1000 * 60 * 60 * 24;
 
@@ -21,46 +13,14 @@ export const Marketplace = () => {
     nftid: "",
     loading: false,
   });
-  const [tokenId, setTokenId] = useState("");
-  const navigate = useNavigate();
 
   const { Tenk } = useTenkNear();
   const { Auction } = useAuctionNear();
 
-  const [nfts, setNFTs] = useState<TokenSale[]>();
+  const saleNFTsQuery = useSaleNFTs(Tenk, Auction);
+  const { data: nfts = [] } = saleNFTsQuery;
+
   const [timeLeft, setTimeLeft] = useState<String[]>();
-
-  // at first load, auto-submit if required arguments are fill in
-  useEffect(() => {
-    const getAuctions = async () => {
-      const args = {
-        nft_contract_id: TENK_CONTRACT_ACCOUNT,
-        from_index: "0",
-        limit: 50,
-      };
-
-      const res = await Auction?.account.viewFunction(
-        AUCTION_CONTRACT_ACCOUNT,
-        "get_sales_by_nft_contract_id",
-        args
-      );
-      if (res) {
-        console.log(res);
-        const token_sales: TokenSale[] = [];
-        for (let i = 0; i < res.length; i++) {
-          const nft = await getNFT(res[i].token_id);
-          const token_sale = {
-            sale: res[i],
-            token: nft,
-          };
-          token_sales.push(token_sale);
-        }
-        setNFTs(token_sales);
-        console.log(token_sales);
-      }
-    };
-    getAuctions();
-  }, [Tenk]);
 
   useEffect(() => {
     const timeoutId = setTimeout(step, 1000);
@@ -106,19 +66,9 @@ export const Marketplace = () => {
     setTimeLeft(lefts);
   }
 
-  const getNFT = async (nftid: string) => {
-    const args = { token_id: nftid };
-    const res: Sale = await Tenk?.account.viewFunction(
-      Tenk.contractId,
-      "nft_token",
-      args
-    );
-    return res;
-  };
-
-  const goToDetail = (name: string, nftid: string) => {
-    setShowModal({ name, nftid, loading: true }); //navigate(`/myassets/asset/${nftid}`);
-    setTokenId(nftid);
+  const handleOnClick = (name: string, nftid: string) => {
+    setShowModal({ name, nftid, loading: true });
+    saleNFTsQuery.refetch();
   };
 
   return (
@@ -139,7 +89,7 @@ export const Marketplace = () => {
         <div className="dlion">
           <div className={css.nft_tokens}>
             <>
-              {nfts?.map((nft, index) => {
+              {nfts.map((nft, index) => {
                 return (
                   <div className={css.nft_token} key={nft.token.token_id}>
                     <img
@@ -149,7 +99,7 @@ export const Marketplace = () => {
                         nft.token.metadata?.media
                       }
                       onClick={(e) =>
-                        goToDetail("NFTDetail", nft.token.token_id)
+                        handleOnClick("NFTDetail", nft.token.token_id)
                       }
                     />
                     <div className={css.nft_token_info}>
@@ -173,7 +123,10 @@ export const Marketplace = () => {
                               <button
                                 className="purple"
                                 onClick={() =>
-                                  goToDetail("AuctionBid", nft.token.token_id)
+                                  handleOnClick(
+                                    "AuctionBid",
+                                    nft.token.token_id
+                                  )
                                 }
                               >
                                 Place Bid
@@ -185,7 +138,7 @@ export const Marketplace = () => {
                             <button
                               className="purple"
                               onClick={() =>
-                                goToDetail("AuctionView", nft.token.token_id)
+                                handleOnClick("AuctionView", nft.token.token_id)
                               }
                             >
                               View Auction

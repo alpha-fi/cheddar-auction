@@ -15,7 +15,6 @@ export const Header = () => {
   const { wallet, signIn, signOut } = useNear();
 
   const isMarketplace = () => {
-    console.log("currentPath", currentPath, currentPath.split("/"));
     if (currentPath.split("/")[1] == "marketplace") return true;
   };
 
