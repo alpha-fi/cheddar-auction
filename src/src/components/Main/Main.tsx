@@ -1,33 +1,29 @@
-import { init, init_auction } from "../../near"
-import css from "./Main.module.css"
-import { Form, Layout, NotFound } from ".."
+import { Route, Routes } from "react-router-dom";
+import useAuctionNear from "../../hooks/useAuctionNear";
+import { useSaleNFTs } from "../../hooks/useSaleNFTs";
+import useTenkNear from "../../hooks/useTenkNear";
+import { useUserNFTs } from "../../hooks/useUserNFTs";
+import { Footer } from "../Footer/Footer";
+import { Header } from "../Header/Header";
+import { Marketplace } from "../Marketplace/Marketplace";
+import { NFTs } from "../NFTs/NFTs";
+import { Storage } from "../Storage/Storage";
 
 export function Main() {
-//   const { contract } = useParams<{ contract: string }>()
-
-  let errorMessage: string | null = null
-
-  try {
-    init();
-    init_auction();
-  } catch (e: unknown) {
-    if (e instanceof Error) {
-      errorMessage = e.message
-    } else {
-      errorMessage = String(e)
-    }
-  }
+  const { Tenk } = useTenkNear();
+  const { Auction } = useAuctionNear();
+  useUserNFTs(Tenk, Auction);
+  useSaleNFTs(Tenk, Auction);
 
   return (
-    <Layout>
-      {/* {errorMessage
-        ? <NotFound>{errorMessage}</NotFound>
-        : <Form />
-      } */}
-      <div style={{display: "table-column"}}>
-        <button className={css.secondary}>Auctions</button>
-        <button className={css.secondary}>My NFTs</button>
-      </div>
-    </Layout>
-  )
+    <>
+      <Header />
+      <Routes>
+        <Route path="/" element={<NFTs />} />
+        <Route path="/myassets/storage" element={<Storage />} />
+        <Route path="/marketplace" element={<Marketplace />} />
+      </Routes>
+      <Footer />
+    </>
+  );
 }
