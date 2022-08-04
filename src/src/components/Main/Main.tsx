@@ -14,7 +14,7 @@ export function Main() {
   const { Auction } = useAuctionNear();
   const userNFTsQuery = useUserNFTs(Tenk, Auction);
   const saleNFTsQuery = useSaleNFTs(Tenk, Auction);
-  console.log(Tenk);
+
   return (
     <>
       <Header />

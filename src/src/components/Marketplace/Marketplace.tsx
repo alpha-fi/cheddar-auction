@@ -7,8 +7,21 @@ import { useSaleNFTs } from "../../hooks/useSaleNFTs";
 import Spinner from "../Spinner/Spinner";
 import { TokenSale } from "../NFTs/NFTs";
 import { useQuery, UseQueryResult } from "react-query";
+import { keyframes, styled } from "@stitches/react";
 
 const ONE_DAY = 1000 * 60 * 60 * 24;
+
+const contentShow = keyframes({
+  "0%": { opacity: 0 },
+  "100%": { opacity: 1 },
+});
+
+const StyledContent = styled("div", {
+  "@media (prefers-reduced-motion: no-preference)": {
+    animation: `${contentShow} 3000ms cubic-bezier(0.16, 1, 0.3, 1) forwards`,
+  },
+  "&:focus": { outline: "none" },
+});
 
 export type ShowModal = {
   name: string;
@@ -61,19 +74,15 @@ export const Marketplace = ({ saleNFTsQuery }: Props) => {
           const minutes = Math.floor((remaining / 1000 / 60) % 60);
           const seconds = Math.floor((remaining / 1000) % 60);
 
-          if (days > 0)
-            left =
-              days +
-              "Days " +
-              hours +
-              " Hours " +
-              minutes +
-              " Minutes " +
-              seconds +
-              " Seconds";
-          else
-            left =
-              hours + " Hours " + minutes + " Minutes " + seconds + " Seconds";
+          if (days > 0) {
+            left = `${days} ${days === 1 ? "Day" : "Days"} and ${hours}:${
+              minutes < 10 ? "0" + minutes : minutes
+            }:${seconds < 10 ? "0" + seconds : seconds}`;
+          } else {
+            left = `${hours}:${minutes < 10 ? "0" + minutes : minutes}:${
+              seconds < 10 ? "0" + seconds : seconds
+            }`;
+          }
         }
 
         lefts.push(left);
@@ -108,55 +117,73 @@ export const Marketplace = ({ saleNFTsQuery }: Props) => {
             <>
               {nfts.map((nft, index) => {
                 return (
-                  <div className={css.nft_token} key={nft.token.token_id}>
-                    <img
-                      id={"market" + nft.token.metadata?.media}
-                      alt="NFT"
-                      src={
-                        "https://bafybeibghcllcmurku7lxyg4wgxn2zsu5qqk7h4r6bmyhpztmyd564cx54.ipfs.nftstorage.link/" +
-                        nft.token.metadata?.media
-                      }
-                      onClick={(e) => handleOnClick("NFTDetail", nft)}
-                    />
-                    <div className={css.nft_token_info}>
-                      <div style={{ display: "flex" }}>
-                        <div>
-                          <b className="title">NFT Id: {nft.token.token_id}</b>
-                          <br />
-                          {timeLeft && (
-                            <>
-                              <b className="title">{timeLeft![index]}</b>
-                              <br />
-                            </>
-                          )}
+                  <StyledContent key={nft.token.token_id}>
+                    <div
+                      className={css.nft_token}
+                      id={"marketcard" + nft.token.token_id}
+                      style={{ display: "none" }}
+                    >
+                      <img
+                        alt="NFT"
+                        onLoad={() => {
+                          document
+                            .getElementById("marketcard" + nft.token.token_id)
+                            ?.setAttribute("style", "display: inherit");
+                        }}
+                        src={
+                          "https://bafybeibghcllcmurku7lxyg4wgxn2zsu5qqk7h4r6bmyhpztmyd564cx54.ipfs.nftstorage.link/" +
+                          nft.token.metadata?.media
+                        }
+                        onClick={(e) => handleOnClick("NFTDetail", nft)}
+                      />
+                      <div className={css.nft_token_info}>
+                        <div style={{ display: "flex" }}>
+                          <div>
+                            {timeLeft && (
+                              <>
+                                <b className="title">
+                                  Remaining: {timeLeft![index]}
+                                </b>
+                                <br />
+                              </>
+                            )}
+                            <b className="title">
+                              NFT Id: {nft.token.token_id}
+                            </b>
+                            <br />
+                          </div>
                         </div>
-                      </div>
-                      <div style={{ display: "flex" }}>
-                        {timeLeft &&
-                          timeLeft![index] != "Ended" &&
-                          nft.token.owner_id != Tenk?.account.accountId && (
+                        <div style={{ display: "flex" }}>
+                          {timeLeft &&
+                            timeLeft![index] != "Ended" &&
+                            nft.token.owner_id != Tenk?.account.accountId && (
+                              <div style={{ alignSelf: "flex-end" }}>
+                                <button
+                                  className="purple"
+                                  onClick={() =>
+                                    handleOnClick("AuctionBid", nft)
+                                  }
+                                >
+                                  Place Bid
+                                </button>
+                              </div>
+                            )}
+                          {timeLeft && timeLeft![index] == "Ended" && (
                             <div style={{ alignSelf: "flex-end" }}>
                               <button
                                 className="purple"
-                                onClick={() => handleOnClick("AuctionBid", nft)}
+                                onClick={() =>
+                                  handleOnClick("AuctionView", nft)
+                                }
                               >
-                                Place Bid
+                                View Auction
                               </button>
                             </div>
                           )}
-                        {timeLeft && timeLeft![index] == "Ended" && (
-                          <div style={{ alignSelf: "flex-end" }}>
-                            <button
-                              className="purple"
-                              onClick={() => handleOnClick("AuctionView", nft)}
-                            >
-                              View Auction
-                            </button>
-                          </div>
-                        )}
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  </StyledContent>
                 );
               })}
             </>

@@ -51,16 +51,24 @@ export const NFTDetail = ({ show, setShow }: Props) => {
           />
         </div>
         <div className={css.nft_description}>
-          <b className="title">Detail of NFT</b>
-          <br />
-          <br />
-          <b className="title">Token ID: {nft?.token_id}</b>
-          <br />
-          <b className="title">Owner: {nft?.owner_id}</b>
-          <br />
-          <b className="title">Title: {nft?.metadata?.title}</b>
-          <br />
-          <b className="title">Description: {nft?.metadata?.description}</b>
+          <div>
+            <b className="title">DETAIL OF NFT</b>
+            <br />
+            <br />
+            <b className="title">Token ID: {nft?.token_id}</b>
+            <br />
+            <b className="title">Owner: {nft?.owner_id}</b>
+            <br />
+            {false && (
+              <>
+                <b className="title">Title: {nft?.metadata?.title}</b>
+                <br />
+                <b className="title">
+                  Description: {nft?.metadata?.description}
+                </b>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </div>

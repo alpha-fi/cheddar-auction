@@ -25,11 +25,17 @@ export const HamburgerMenu = () => {
   const currentPath = location.pathname;
 
   const isMarketplace = () => {
-    console.log("currentPath", currentPath, currentPath.split("/"));
-    if (currentPath.split("/")[1] == "marketplace") return true;
+    if (currentPath.split("/")[1] == "") return true;
   };
 
   const { wallet, signIn, signOut } = useNear();
+
+  const singOutAndRedirect = () => {
+    navigate("/");
+    if (signOut) {
+      signOut();
+    }
+  };
 
   return (
     <>
@@ -52,7 +58,7 @@ export const HamburgerMenu = () => {
             width="30px"
           />
         )}
-        <div className={css.link} onClick={() => handleClose("/marketplace")}>
+        <div className={css.link} onClick={() => handleClose("/")}>
           <span
             style={isMarketplace() ? { borderBottom: "2px solid black" } : {}}
           >
@@ -60,7 +66,7 @@ export const HamburgerMenu = () => {
           </span>
         </div>
         {wallet && wallet.getAccountId() && (
-          <div className={css.link} onClick={() => handleClose("/")}>
+          <div className={css.link} onClick={() => handleClose("/myassets")}>
             <span
               style={{
                 borderBottom: !isMarketplace() ? "2px solid black" : "",
@@ -83,7 +89,7 @@ export const HamburgerMenu = () => {
                 items={[
                   {
                     children: "Sign Out",
-                    onSelect: signOut,
+                    onSelect: singOutAndRedirect,
                   },
                 ]}
               />

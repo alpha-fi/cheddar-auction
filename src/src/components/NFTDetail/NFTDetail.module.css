@@ -2,23 +2,74 @@
   -webkit-box-flex: 1;
   flex-grow: 1;
   flex-basis: 50%;
-  max-width: 50%;
+  max-width: 100%;
   padding: 0%;
   color: black;
+  background-color: #ebe7f5;
+}
+
+.nft_token img {
+  height: 100%;
 }
 
 .nft_description {
   -webkit-box-flex: 1;
+  display: flex;
   flex-grow: 1;
   flex-basis: 50%;
-  max-width: 50%;
-  padding: 5% 10%;
+  align-items: center;
+  padding: 20px;
+  max-width: 100%;
   background-color: #ebe7f5;
   color: black;
 }
 
+.nft_description div {
+  width: 100%;
+}
+
 .nft_container {
   display: flex;
+  flex-direction: column;
   flex-wrap: wrap;
   max-width: 100%;
+}
+
+@media (min-width: 576px) {
+  .nft_token {
+    -webkit-box-flex: 1;
+    flex-grow: 1;
+    flex-basis: 50%;
+    max-width: 50%;
+    padding: 0%;
+    background-color: #ebe7f5;
+    color: black;
+    background-size: cover;
+    position: relative;
+    min-height: 100%;
+  }
+
+  .nft_description {
+    -webkit-box-flex: 1;
+    flex-grow: 1;
+    flex-basis: 50%;
+    max-width: 50%;
+    background-color: #ebe7f5;
+    color: black;
+  }
+
+  .nft_container {
+    flex-direction: row;
+  }
+}
+
+@media (min-width: 768px) {
+  .nft_token {
+    max-width: 50%;
+  }
+
+  .nft_description {
+    max-width: 50%;
+    padding-left: 50px;
+  }
 }

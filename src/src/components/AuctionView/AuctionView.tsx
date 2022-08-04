@@ -43,9 +43,7 @@ export const AuctionView = ({ show, setShow }: Props) => {
     const getNFTs = async () => {
       if (show.nft?.sale) {
         const sale = show.nft.sale;
-        console.log(sale);
         if (sale.bids) {
-          console.log("bids: ", JSON.stringify(sale.bids));
           let bids = new Map(Object.entries(sale.bids));
           const sale_view: SaleView = {
             bids: bids.get(sale.ft_token_type),
@@ -60,7 +58,6 @@ export const AuctionView = ({ show, setShow }: Props) => {
             sale: sale_view,
           };
           setNFT(token_sale);
-          console.log(nft);
         } else {
           setNFT({ token: show.nft.token });
         }
@@ -210,97 +207,118 @@ export const AuctionView = ({ show, setShow }: Props) => {
               />
             </div>
             <div className={css.nft_description}>
-              <b
-                className="title"
-                style={{ padding: "10% 0", fontSize: "18px" }}
-              >
-                Create Auction
-              </b>
-              <br />
-              <br />
+              <div>
+                <b
+                  className="title"
+                  style={{ padding: "10% 0", fontSize: "18px" }}
+                >
+                  VIEW AUCTION
+                </b>
+                <br />
+                <br />
 
-              <b className="title">Token ID: {nft?.token.token_id}</b>
-              <br />
-              <b className="title">
-                Description: {nft?.token.metadata?.description}
-              </b>
-              <br />
-              {nft?.sale && !loading && status == NFT_STATUS.ONAUCTION && (
-                <>
-                  <b className="title">
-                    Initial Price: {(nft?.sale.price).toFixed(2)}
-                  </b>{" "}
-                  {nft.sale?.ft_token_type == "near" ? "NEAR" : "CHEDDAR"}
-                  <br />
-                  <b className="title">Remaining: {timeLeft}</b>
-                  <br />
-                  <br />
-                </>
-              )}
+                <b className="title">Token ID: {nft?.token.token_id}</b>
+                <br />
+                {false && (
+                  <>
+                    <b className="title">
+                      Description: {nft?.token.metadata?.description}
+                    </b>
+                    <br />
+                  </>
+                )}
+                {nft?.sale && !loading && status == NFT_STATUS.ONAUCTION && (
+                  <>
+                    <b className="title">
+                      Initial Price: {(nft?.sale.price).toFixed(2)}
+                    </b>{" "}
+                    {nft.sale?.ft_token_type == "near" ? "NEAR" : "CHEDDAR"}
+                    <br />
+                    <b className="title">Remaining: {timeLeft}</b>
+                    <br />
+                    <br />
+                  </>
+                )}
 
-              {nft?.sale?.bids && (
-                <>
-                  <b
-                    className="title"
-                    style={{ padding: "10% 0", fontSize: "18px" }}
-                  >
-                    Bids
-                  </b>
-                  <br />
-                  {nft.sale.bids.map((bid) => {
-                    return (
+                {nft?.sale?.bids && (
+                  <>
+                    <b
+                      className="title"
+                      style={{ padding: "10% 0", fontSize: "18px" }}
+                    >
+                      Bid
+                    </b>
+                    <br />
+                    {nft.sale.bids && (
                       <>
-                        <b className="title">Bid Owner: {bid.owner_id}</b>
+                        <b className="title">
+                          Bid Owner:{" "}
+                          {nft.sale.bids[nft.sale.bids?.length - 1].owner_id
+                            .length > 20
+                            ? nft.sale.bids[
+                                nft.sale.bids?.length - 1
+                              ].owner_id.substring(0, 20) + "..."
+                            : nft.sale.bids[nft.sale.bids?.length - 1].owner_id}
+                        </b>
                         <br />
                         <b className="title">
                           Bid Price:{" "}
-                          {(parseInt(bid.price) / Math.pow(10, 24)).toFixed(3)}{" "}
+                          {(
+                            parseInt(
+                              nft.sale.bids[nft.sale.bids?.length - 1].price
+                            ) / Math.pow(10, 24)
+                          ).toFixed(2)}{" "}
                           {nft.sale?.ft_token_type == "near"
                             ? "NEAR"
                             : "CHEDDAR"}
                         </b>
                         <br />
-                        <br />
                       </>
-                    );
-                  })}
-                </>
-              )}
+                    )}
+                  </>
+                )}
 
-              {status == NFT_STATUS.ONAUCTION && !nft?.sale && (
-                <>
-                  <b className="title">SALED</b>
-                  <br />
-                  <button className="purple" onClick={(e) => navigate("/")}>
-                    RETURN
-                  </button>
-                  <br />
-                </>
-              )}
+                {status == NFT_STATUS.ONAUCTION && !nft?.sale && (
+                  <>
+                    <b className="title">SALED</b>
+                    <br />
+                    <button className="purple" onClick={(e) => navigate("/")}>
+                      RETURN
+                    </button>
+                    <br />
+                  </>
+                )}
 
-              {nft?.sale && nft.token.owner_id == Tenk?.account.accountId && (
-                <>
-                  {nft.sale.bids && (
-                    <>
-                      <br />
-                      <button className="purple" onClick={(e) => acceptBid()}>
-                        Accept Bid
-                      </button>
-                      <br />
-                    </>
-                  )}
-                  <button className="purple" onClick={(e) => cancelAuction()}>
-                    Cancel Auction
-                  </button>
-                </>
-              )}
-              {claimable && (
-                <>
-                  <button className="purple" onClick={(e) => claimNFT()}>
-                    Claim NFT
-                  </button>
-                </>
-              )}
+                {nft?.sale && nft.token.owner_id == Tenk?.account.accountId && (
+                  <>
+                    {nft.sale.bids && (
+                      <>
+                        <br />
+                        <button
+                          className="purple"
+                          style={{ marginRight: "10px" }}
+                          onClick={(e) => acceptBid()}
+                        >
+                          Accept Bid
+                        </button>
+                      </>
+                    )}
+                    <button
+                      style={{ backgroundColor: "red" }}
+                      onClick={(e) => cancelAuction()}
+                    >
+                      Cancel Auction
+                    </button>
+                  </>
+                )}
+                {claimable && (
+                  <>
+                    <button className="purple" onClick={(e) => claimNFT()}>
+                      Claim NFT
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </div>

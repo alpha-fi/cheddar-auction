@@ -16,7 +16,7 @@ const overlayShow = keyframes({
 });
 
 const contentShow = keyframes({
-  "0%": { opacity: 0, transform: "translate(-50%, -48%) scale(.96)" },
+  "0%": { opacity: 0, transform: "translate(-50%, -50%) scale(.96)" },
   "100%": { opacity: 1, transform: "translate(-50%, -50%) scale(1)" },
 });
 
@@ -30,7 +30,7 @@ const StyledOverlay = styled(DialogPrimitive.Overlay, {
 });
 
 const StyledContent = styled(DialogPrimitive.Content, {
-  backgroundColor: "white",
+  backgroundColor: "#ebe7f5",
   borderRadius: 6,
   boxShadow:
     "hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px",
@@ -39,12 +39,17 @@ const StyledContent = styled(DialogPrimitive.Content, {
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: "90vw",
-  overflow: "hidden",
-  maxWidth: "900px",
-  maxHeight: "85vh",
+  overflow: "auto",
+  maxWidth: "45vh",
   padding: 0,
+  maxHeight: "98vh",
   "@media (prefers-reduced-motion: no-preference)": {
     animation: `${contentShow} 150ms cubic-bezier(0.16, 1, 0.3, 1) forwards`,
+  },
+  "@media (min-width: 576px)": {
+    maxWidth: "900px",
+    width: "98vw",
+    overflow: "hidden",
   },
   "&:focus": { outline: "none" },
 });

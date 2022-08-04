@@ -91,7 +91,6 @@ export const AuctionCreate = ({ show, setShow }: Props) => {
           sale: sale,
         };
         setNFT(token_sale);
-        console.log(token_sale);
       }
     };
     getNFTs();
@@ -125,60 +124,55 @@ export const AuctionCreate = ({ show, setShow }: Props) => {
               />
             </div>
             <div className={css.nft_description}>
-              <b className="title" style={{ padding: "10% 0" }}>
-                Create Auction
-              </b>
-              <br />
-              <br />
+              <div>
+                <b className="title" style={{ padding: "10% 0" }}>
+                  CREATE AUCTION
+                </b>
+                <br />
+                <br />
 
-              <b className="title">Token ID: {nft?.token.token_id}</b>
-              <br />
-              <b className="title">
-                Description: {nft?.token.metadata?.description}
-              </b>
-              <br />
-              <b className="title">
-                Status: {nft?.sale ? "On Auction" : "Not Auctioned"}
-              </b>
-              <br />
-              <br />
+                <b className="title">Token ID: {nft?.token.token_id}</b>
 
-              <b className="title">Price</b>
-              <br />
-              <input
-                type="number"
-                value={price.toString()}
-                onChange={(e) => setPrice(parseFloat(e.target.value))}
-              />
-              <br />
+                <br />
+                <br />
 
-              <b className="title">Auction Finish Time</b>
-              <br />
-              <input
-                type="datetime-local"
-                value={endtime}
-                onChange={(e) => setEndTime(e.target.value)}
-              />
-              <br />
+                <b className="title">Price</b>
+                <br />
+                <input
+                  type="number"
+                  value={price.toString()}
+                  onChange={(e) => setPrice(parseFloat(e.target.value))}
+                />
+                <br />
 
-              <b className="title">FT Type</b>
-              <br />
-              <select onChange={(e) => setFT(e.target.value)}>
-                <option value="NEAR">NEAR</option>
-                <option value="CHEDDAR">CHEDDAR</option>
-              </select>
-              <br />
-              <br />
+                <b className="title">Auction Finish Time</b>
+                <br />
+                <input
+                  type="datetime-local"
+                  value={endtime}
+                  onChange={(e) => setEndTime(e.target.value)}
+                />
+                <br />
 
-              {nft?.sale ? (
-                <button className="purple" onClick={(e) => navigate("/")}>
-                  Return
-                </button>
-              ) : (
-                <button className="purple" onClick={(e) => onCreateAuction()}>
-                  Create
-                </button>
-              )}
+                <b className="title">FT Type</b>
+                <br />
+                <select onChange={(e) => setFT(e.target.value)}>
+                  <option value="NEAR">NEAR</option>
+                  <option value="CHEDDAR">CHEDDAR</option>
+                </select>
+                <br />
+                <br />
+
+                {nft?.sale ? (
+                  <button className="purple" onClick={(e) => navigate("/")}>
+                    Return
+                  </button>
+                ) : (
+                  <button className="purple" onClick={(e) => onCreateAuction()}>
+                    Create
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>

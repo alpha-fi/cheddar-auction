@@ -43,7 +43,6 @@ export const AuctionBid = ({ show, setShow }: Props) => {
       if (show.nft?.sale) {
         const sale = show.nft.sale;
         if (sale?.bids) {
-          console.log("bids: ", JSON.stringify(sale.bids));
           let bids = new Map(Object.entries(sale.bids));
           const sale_view: SaleView = {
             bids: bids.get(sale.ft_token_type),
@@ -58,7 +57,6 @@ export const AuctionBid = ({ show, setShow }: Props) => {
             sale: sale_view,
           };
           setNFT(token_sale);
-          console.log(nft);
         } else setNFT({ token: show.nft.token });
       }
     };
@@ -171,51 +169,66 @@ export const AuctionBid = ({ show, setShow }: Props) => {
               />
             </div>
             <div className={css.nft_description}>
-              <>
-                <b
-                  className="title"
-                  style={{ padding: "10% 0", fontSize: "18px" }}
-                >
-                  Place Bid
-                </b>
-                <br />
-                <br />
-                <b className="title">Token ID: {nft?.token.token_id}</b>
-                <br />
-                <b className="title">Owner: {nft?.token?.owner_id}</b>
-                <br />
-                <b className="title">
-                  Description: {nft?.token.metadata?.description}
-                </b>
-                <br />
-                <b className="title">
-                  Initial Price: {nft?.sale?.price?.toFixed(2)}{" "}
-                  {nft?.sale?.ft_token_type == "near" ? "NEAR" : "CHEDDAR"}
-                </b>
-                <br />
-                <b className="title">Remaining: {timeLeft}</b>
-                <br />
-                <br />
+              <div>
+                <>
+                  <b
+                    className="title"
+                    style={{ padding: "10% 0", fontSize: "18px" }}
+                  >
+                    PLACE BID
+                  </b>
+                  <br />
+                  <br />
+                  <b className="title">Token ID: {nft?.token.token_id}</b>
+                  <br />
+                  <b className="title">Owner: {nft?.token?.owner_id}</b>
+                  <br />
+                  {false && (
+                    <>
+                      <b className="title">
+                        Description: {nft?.token.metadata?.description}
+                      </b>
+                      <br />
+                    </>
+                  )}
+                  <b className="title">
+                    Initial Price: {nft?.sale?.price?.toFixed(2)}{" "}
+                    {nft?.sale?.ft_token_type == "near" ? "NEAR" : "CHEDDAR"}
+                  </b>
+                  <br />
+                  <b className="title">Remaining: {timeLeft}</b>
+                  <br />
+                  <br />
 
-                {nft?.sale?.bids && (
-                  <>
-                    <b
-                      className="title"
-                      style={{ padding: "10% 0", fontSize: "18px" }}
-                    >
-                      Bids
-                    </b>
-                    <br />
-                    {nft.sale.bids.map((bid) => {
-                      return (
+                  {nft?.sale?.bids && (
+                    <>
+                      <b
+                        className="title"
+                        style={{ padding: "10% 0", fontSize: "18px" }}
+                      >
+                        Bids
+                      </b>
+                      <br />
+                      {nft.sale.bids && (
                         <>
-                          <b className="title">Bid Owner: {bid.owner_id}</b>
+                          <b className="title">
+                            Bid Owner:{" "}
+                            {nft.sale.bids[nft.sale.bids?.length - 1].owner_id
+                              .length > 20
+                              ? nft.sale.bids[
+                                  nft.sale.bids?.length - 1
+                                ].owner_id.substring(0, 20) + "..."
+                              : nft.sale.bids[nft.sale.bids?.length - 1]
+                                  .owner_id}
+                          </b>
                           <br />
                           <b className="title">
                             Bid Price:{" "}
-                            {(parseInt(bid.price) / Math.pow(10, 24)).toFixed(
-                              3
-                            )}{" "}
+                            {(
+                              parseInt(
+                                nft.sale.bids[nft.sale.bids?.length - 1].price
+                              ) / Math.pow(10, 24)
+                            ).toFixed(2)}{" "}
                             {nft.sale?.ft_token_type == "near"
                               ? "NEAR"
                               : "CHEDDAR"}
@@ -223,35 +236,33 @@ export const AuctionBid = ({ show, setShow }: Props) => {
                           <br />
                           <br />
                         </>
-                      );
-                    })}
-                  </>
-                )}
+                      )}
+                    </>
+                  )}
 
-                <br />
-                <b className="title">Price</b>
-                <br />
-                <input
-                  type="number"
-                  value={price.toString()}
-                  onChange={(e) => setPrice(parseFloat(e.target.value))}
-                />
-                <br />
-                <br />
+                  <b className="title">Price</b>
+                  <br />
+                  <input
+                    type="number"
+                    value={price.toString()}
+                    onChange={(e) => setPrice(parseFloat(e.target.value))}
+                    style={{ marginRight: "10px", width: "100px" }}
+                  />
 
-                {timeLeft != "Ended" &&
-                  Auction?.account.accountId &&
-                  nft?.token?.owner_id != Auction.account.accountId && (
-                    <button className="purple" onClick={(e) => placeBid()}>
-                      Place Bid
+                  {timeLeft != "Ended" &&
+                    Auction?.account.accountId &&
+                    nft?.token?.owner_id != Auction.account.accountId && (
+                      <button className="purple" onClick={(e) => placeBid()}>
+                        Place Bid
+                      </button>
+                    )}
+                  {!Auction?.account.accountId && (
+                    <button className="yellow" onClick={signIn}>
+                      Connect Wallet
                     </button>
                   )}
-                {!Auction?.account.accountId && (
-                  <button className="purple" onClick={signIn}>
-                    Connect Wallet
-                  </button>
-                )}
-              </>
+                </>
+              </div>
             </div>
           </div>
         </div>
