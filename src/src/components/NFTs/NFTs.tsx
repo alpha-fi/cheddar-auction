@@ -6,6 +6,9 @@ import { Token } from "../../near/contracts/tenk/index";
 import { Sale } from "../../near/contracts/auction/index";
 import NFTModal from "../NFTModal/NFTModal";
 import { useUserNFTs } from "../../hooks/useUserNFTs";
+import Spinner from "../Spinner/Spinner";
+import { ShowModal } from "../Marketplace/Marketplace";
+import { useQuery, UseQueryResult } from "react-query";
 
 export const DELIMETER = "||";
 
@@ -14,21 +17,24 @@ export interface TokenSale {
   sale?: Sale;
 }
 
-export const NFTs = () => {
-  const [showModal, setShowModal] = useState({
+type Props = {
+  userNFTsQuery: UseQueryResult<TokenSale[], unknown>;
+};
+
+export const NFTs = ({ userNFTsQuery }: Props) => {
+  const [showModal, setShowModal] = useState<ShowModal>({
     name: "",
-    nftid: "",
+    nft: null,
     loading: false,
   });
 
   const { Tenk } = useTenkNear();
   const { Auction } = useAuctionNear();
 
-  const userNFTsQuery = useUserNFTs(Tenk, Auction);
   const { data: nfts = [] } = userNFTsQuery;
 
-  const handleOnClick = (name: string, nftid: string) => {
-    setShowModal({ name, nftid, loading: true });
+  const handleOnClick = (name: string, nft: TokenSale) => {
+    setShowModal({ name, nft, loading: true });
     userNFTsQuery.refetch();
   };
 
@@ -47,6 +53,8 @@ export const NFTs = () => {
             </a>
           </div>
         </div>
+      ) : userNFTsQuery.isLoading ? (
+        <Spinner />
       ) : (
         <div style={{ display: "flex", justifyContent: "center" }}>No NFTs</div>
       )}
@@ -64,27 +72,21 @@ export const NFTs = () => {
                         "https://bafybeibghcllcmurku7lxyg4wgxn2zsu5qqk7h4r6bmyhpztmyd564cx54.ipfs.nftstorage.link/" +
                         nft.token.metadata?.media
                       }
-                      onClick={(e) =>
-                        handleOnClick("NFTDetail", nft.token.token_id)
-                      }
+                      onClick={(e) => handleOnClick("NFTDetail", nft)}
                     />
                     <div className={css.nft_token_info}>
                       <b className="title">NFT Id:{nft.token.token_id}</b>
                       {nft.sale ? (
                         <button
                           className="purple"
-                          onClick={() =>
-                            handleOnClick("AuctionView", nft.token.token_id)
-                          }
+                          onClick={() => handleOnClick("AuctionView", nft)}
                         >
                           View Auction
                         </button>
                       ) : (
                         <button
                           className="purple"
-                          onClick={() =>
-                            handleOnClick("AuctionCreate", nft.token.token_id)
-                          }
+                          onClick={() => handleOnClick("AuctionCreate", nft)}
                         >
                           Create Auction
                         </button>

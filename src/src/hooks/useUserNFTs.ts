@@ -26,7 +26,7 @@ const getAuctions = async (
   auction: AuctionContract | undefined
 ) => {
   const token_sales: TokenSale[] = [];
-  if (tenk && auction) {
+  if (tenk?.account.accountId && auction) {
     const args = {
       account_id: tenk.account.accountId,
       from_index: "0",
@@ -58,7 +58,6 @@ export const useUserNFTs = (
 ) => {
   return useQuery(["UserNFTs"], () => getAuctions(tenk, auction), {
     refetchInterval: 30000,
-    cacheTime: 0,
     notifyOnChangePropsExclusions: ["isStale", "isRefetching", "isFetching"],
   });
 };

@@ -15,12 +15,19 @@ export const Header = () => {
   const { wallet, signIn, signOut } = useNear();
 
   const isMarketplace = () => {
-    if (currentPath.split("/")[1] == "marketplace") return true;
+    if (currentPath.split("/")[1] == "") return true;
   };
 
   const { width } = useScreenSize();
 
   const hamburgerBreakpoint = 576;
+
+  const singOutAndRedirect = () => {
+    navigate("/");
+    if (signOut) {
+      signOut();
+    }
+  };
 
   return (
     <nav className={css.header}>
@@ -83,7 +90,7 @@ export const Header = () => {
                 style={
                   isMarketplace() ? { borderBottom: "2px solid black" } : {}
                 }
-                onClick={(e) => navigate("/marketplace")}
+                onClick={(e) => navigate("/")}
               >
                 Marketplace
               </div>
@@ -94,7 +101,7 @@ export const Header = () => {
                     borderBottom: !isMarketplace() ? "2px solid black" : "",
                     marginRight: "15px",
                   }}
-                  onClick={(e) => navigate("/")}
+                  onClick={(e) => navigate("/myassets")}
                 >
                   My&nbsp;Assets
                 </div>
@@ -119,7 +126,7 @@ export const Header = () => {
                   items={[
                     {
                       children: "Sign Out",
-                      onSelect: signOut,
+                      onSelect: singOutAndRedirect,
                     },
                   ]}
                 />

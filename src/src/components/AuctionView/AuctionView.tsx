@@ -9,6 +9,7 @@ import { Bid, Sale, SaleView } from "../../near/contracts/auction/index";
 import css from "../NFTDetail/NFTDetail.module.css";
 import { DELIMETER } from "../NFTs/NFTs";
 import { FT_CONTRACT_ACCOUNT } from "../Constants/Contracts";
+import { ShowModal } from "../Marketplace/Marketplace";
 
 interface TokenSale {
   token: Token;
@@ -16,10 +17,8 @@ interface TokenSale {
 }
 
 type Props = {
-  show: { name: string; nftid: string; loading: boolean };
-  setShow: React.Dispatch<
-    React.SetStateAction<{ name: string; nftid: string; loading: boolean }>
-  >;
+  show: ShowModal;
+  setShow: React.Dispatch<React.SetStateAction<ShowModal>>;
 };
 
 export const AuctionView = ({ show, setShow }: Props) => {
@@ -30,7 +29,7 @@ export const AuctionView = ({ show, setShow }: Props) => {
   }
   const navigate = useNavigate();
 
-  const { nftid } = show; //useParams<{ nftid: string }>();
+  const nftid = show.nft?.token.token_id; //useParams<{ nftid: string }>();
   const { Tenk } = useTenkNear();
   const { Auction } = useAuctionNear();
 
@@ -42,16 +41,9 @@ export const AuctionView = ({ show, setShow }: Props) => {
 
   useEffect(() => {
     const getNFTs = async () => {
-      const args = {
-        token_id: nftid,
-      };
-      const token: Token = await Tenk?.account.viewFunction(
-        Tenk.contractId,
-        "nft_token",
-        args
-      );
-      if (token) {
-        const sale = await getSaleForNFT(token.token_id);
+      if (show.nft?.sale) {
+        const sale = show.nft.sale;
+        console.log(sale);
         if (sale.bids) {
           console.log("bids: ", JSON.stringify(sale.bids));
           let bids = new Map(Object.entries(sale.bids));
@@ -64,12 +56,14 @@ export const AuctionView = ({ show, setShow }: Props) => {
           };
 
           const token_sale = {
-            token: token,
+            token: show.nft.token,
             sale: sale_view,
           };
           setNFT(token_sale);
           console.log(nft);
-        } else setNFT({ token: token });
+        } else {
+          setNFT({ token: show.nft.token });
+        }
       }
     };
     getNFTs();
@@ -118,19 +112,6 @@ export const AuctionView = ({ show, setShow }: Props) => {
       }
     }
   }
-
-  const getSaleForNFT = async (nftid: string) => {
-    const nft_contract_token = Auction?.nft_contract_id! + DELIMETER + nftid;
-    const args = { nft_contract_token: nft_contract_token };
-    console.log("args", args);
-    const res: Sale = await Auction?.account.viewFunction(
-      Auction.contractId,
-      "get_sale",
-      args
-    );
-    console.log(res);
-    return res;
-  };
 
   const acceptBid = async () => {
     const args = {

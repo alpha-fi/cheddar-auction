@@ -8,6 +8,7 @@ import { AuctionView } from "../AuctionView/AuctionView";
 import { AuctionBid } from "../AuctionBid/AuctionBid";
 import { AuctionCreate } from "../AuctionCreate/AuctionCreate";
 import Spinner from "../Spinner/Spinner";
+import { ShowModal } from "../Marketplace/Marketplace";
 
 const overlayShow = keyframes({
   "0%": { opacity: 0 },
@@ -70,16 +71,14 @@ export const DialogDescription = StyledDescription;
 export const DialogClose = DialogPrimitive.Close;
 
 type Props = {
-  show: { name: string; nftid: string; loading: boolean };
-  setShow: React.Dispatch<
-    React.SetStateAction<{ name: string; nftid: string; loading: boolean }>
-  >;
+  show: ShowModal;
+  setShow: React.Dispatch<React.SetStateAction<ShowModal>>;
 };
 
 const NFTModal = ({ show, setShow }: Props) => {
   const handleClose = () => {
     window.history.replaceState({}, "", `${window.location.pathname}`);
-    setShow({ name: "", nftid: "", loading: false });
+    setShow({ name: "", nft: null, loading: false });
   };
 
   return (

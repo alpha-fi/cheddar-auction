@@ -55,7 +55,6 @@ export const useSaleNFTs = (
 ) => {
   return useQuery(["SaleNFTs"], () => getAuctions(tenk, auction), {
     refetchInterval: 30000,
-    cacheTime: 0,
     notifyOnChangePropsExclusions: ["isStale", "isRefetching", "isFetching"],
   });
 };

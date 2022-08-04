@@ -4,20 +4,32 @@ import useTenkNear from "../../hooks/useTenkNear";
 import useAuctionNear from "../../hooks/useAuctionNear";
 import NFTModal from "../NFTModal/NFTModal";
 import { useSaleNFTs } from "../../hooks/useSaleNFTs";
+import Spinner from "../Spinner/Spinner";
+import { TokenSale } from "../NFTs/NFTs";
+import { useQuery, UseQueryResult } from "react-query";
 
 const ONE_DAY = 1000 * 60 * 60 * 24;
 
-export const Marketplace = () => {
-  const [showModal, setShowModal] = useState({
+export type ShowModal = {
+  name: string;
+  nft: TokenSale | null;
+  loading: boolean;
+};
+
+type Props = {
+  saleNFTsQuery: UseQueryResult<TokenSale[], unknown>;
+};
+
+export const Marketplace = ({ saleNFTsQuery }: Props) => {
+  const [showModal, setShowModal] = useState<ShowModal>({
     name: "",
-    nftid: "",
+    nft: null,
     loading: false,
   });
 
   const { Tenk } = useTenkNear();
   const { Auction } = useAuctionNear();
 
-  const saleNFTsQuery = useSaleNFTs(Tenk, Auction);
   const { data: nfts = [] } = saleNFTsQuery;
 
   const [timeLeft, setTimeLeft] = useState<String[]>();
@@ -28,6 +40,10 @@ export const Marketplace = () => {
       clearTimeout(timeoutId);
     };
   });
+
+  useEffect(() => {
+    step();
+  }, []);
 
   function step() {
     // const nowTime = (new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000)).getTime();
@@ -66,8 +82,8 @@ export const Marketplace = () => {
     setTimeLeft(lefts);
   }
 
-  const handleOnClick = (name: string, nftid: string) => {
-    setShowModal({ name, nftid, loading: true });
+  const handleOnClick = (name: string, nft: TokenSale) => {
+    setShowModal({ name, nft, loading: true });
     saleNFTsQuery.refetch();
   };
 
@@ -85,6 +101,7 @@ export const Marketplace = () => {
           </a>
         </div>
       </div>
+      {saleNFTsQuery.isLoading && <Spinner />}
       <div className="container">
         <div className="dlion">
           <div className={css.nft_tokens}>
@@ -93,14 +110,13 @@ export const Marketplace = () => {
                 return (
                   <div className={css.nft_token} key={nft.token.token_id}>
                     <img
+                      id={"market" + nft.token.metadata?.media}
                       alt="NFT"
                       src={
                         "https://bafybeibghcllcmurku7lxyg4wgxn2zsu5qqk7h4r6bmyhpztmyd564cx54.ipfs.nftstorage.link/" +
                         nft.token.metadata?.media
                       }
-                      onClick={(e) =>
-                        handleOnClick("NFTDetail", nft.token.token_id)
-                      }
+                      onClick={(e) => handleOnClick("NFTDetail", nft)}
                     />
                     <div className={css.nft_token_info}>
                       <div style={{ display: "flex" }}>
@@ -122,12 +138,7 @@ export const Marketplace = () => {
                             <div style={{ alignSelf: "flex-end" }}>
                               <button
                                 className="purple"
-                                onClick={() =>
-                                  handleOnClick(
-                                    "AuctionBid",
-                                    nft.token.token_id
-                                  )
-                                }
+                                onClick={() => handleOnClick("AuctionBid", nft)}
                               >
                                 Place Bid
                               </button>
@@ -137,9 +148,7 @@ export const Marketplace = () => {
                           <div style={{ alignSelf: "flex-end" }}>
                             <button
                               className="purple"
-                              onClick={() =>
-                                handleOnClick("AuctionView", nft.token.token_id)
-                              }
+                              onClick={() => handleOnClick("AuctionView", nft)}
                             >
                               View Auction
                             </button>

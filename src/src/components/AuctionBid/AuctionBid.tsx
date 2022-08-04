@@ -12,6 +12,7 @@ import { nft_tokens } from "../NFTs/NFTs.module.css";
 import { FT_CONTRACT_ACCOUNT } from "../Constants/Contracts";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { ShowModal } from "../Marketplace/Marketplace";
 const {
   utils: {
     format: { parseNearAmount },
@@ -24,14 +25,12 @@ interface TokenSale {
 }
 
 type Props = {
-  show: { name: string; nftid: string; loading: boolean };
-  setShow: React.Dispatch<
-    React.SetStateAction<{ name: string; nftid: string; loading: boolean }>
-  >;
+  show: ShowModal;
+  setShow: React.Dispatch<React.SetStateAction<ShowModal>>;
 };
 
 export const AuctionBid = ({ show, setShow }: Props) => {
-  const { nftid } = show; //useParams<{ nftid: string }>();
+  const nftid = show.nft?.token.token_id; //useParams<{ nftid: string }>();
   const { Tenk } = useTenkNear();
   const { Auction, signIn } = useAuctionNear();
 
@@ -41,17 +40,9 @@ export const AuctionBid = ({ show, setShow }: Props) => {
 
   useEffect(() => {
     const getNFTs = async () => {
-      const args = {
-        token_id: nftid,
-      };
-      const token: Token = await Tenk?.account.viewFunction(
-        Tenk.contractId,
-        "nft_token",
-        args
-      );
-      if (token) {
-        const sale = await getSaleForNFT(token.token_id);
-        if (sale.bids) {
+      if (show.nft?.sale) {
+        const sale = show.nft.sale;
+        if (sale?.bids) {
           console.log("bids: ", JSON.stringify(sale.bids));
           let bids = new Map(Object.entries(sale.bids));
           const sale_view: SaleView = {
@@ -63,12 +54,12 @@ export const AuctionBid = ({ show, setShow }: Props) => {
           };
 
           const token_sale = {
-            token: token,
+            token: show.nft.token,
             sale: sale_view,
           };
           setNFT(token_sale);
           console.log(nft);
-        } else setNFT({ token: token });
+        } else setNFT({ token: show.nft.token });
       }
     };
     getNFTs();
@@ -112,18 +103,6 @@ export const AuctionBid = ({ show, setShow }: Props) => {
       setTimeLeft(left);
     }
   }
-
-  const getSaleForNFT = async (nftid: string) => {
-    const nft_contract_token = Auction?.nft_contract_id! + DELIMETER + nftid;
-    const args = { nft_contract_token: nft_contract_token };
-    console.log("args", args);
-    const res: Sale = await Auction?.account.viewFunction(
-      Auction.contractId,
-      "get_sale",
-      args
-    );
-    return res;
-  };
 
   const placeBid = async () => {
     let current_price = nft?.sale?.price;

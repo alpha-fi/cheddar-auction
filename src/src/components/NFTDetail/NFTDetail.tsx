@@ -4,36 +4,22 @@ import useTenkNear from "../../hooks/useTenkNear";
 import { Token } from "../../near/contracts/tenk/index";
 import css from "./NFTDetail.module.css";
 import Spinner from "../Spinner/Spinner";
+import { ShowModal } from "../Marketplace/Marketplace";
 
 type Props = {
-  show: { name: string; nftid: string; loading: boolean };
-  setShow: React.Dispatch<
-    React.SetStateAction<{ name: string; nftid: string; loading: boolean }>
-  >;
+  show: ShowModal;
+  setShow: React.Dispatch<React.SetStateAction<ShowModal>>;
 };
 
 export const NFTDetail = ({ show, setShow }: Props) => {
   const { Tenk } = useTenkNear();
 
   const [nft, setNFT] = useState<Token>();
-  // const [auction, setAuction] = useState<
-  const method = "nft_token";
-
-  const { nftid } = show; //useParams<{ nftid: string }>();
 
   useEffect(() => {
     const getNFTs = async () => {
-      const args = {
-        token_id: nftid,
-      };
-      const res: Token = await Tenk?.account.viewFunction(
-        Tenk.contractId,
-        method,
-        args
-      );
-      if (res) {
-        setNFT(res);
-        console.log(res);
+      if (show.nft) {
+        setNFT(show.nft.token);
       }
     };
     getNFTs();

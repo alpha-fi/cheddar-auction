@@ -15,24 +15,23 @@ import { u64 } from "../../near/contracts/auction/helper";
 import { DELIMETER, TokenSale } from "../NFTs/NFTs";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { ShowModal } from "../Marketplace/Marketplace";
 
 type Props = {
-  show: { name: string; nftid: string; loading: boolean };
-  setShow: React.Dispatch<
-    React.SetStateAction<{ name: string; nftid: string; loading: boolean }>
-  >;
+  show: ShowModal;
+  setShow: React.Dispatch<React.SetStateAction<ShowModal>>;
 };
 
 export const AuctionCreate = ({ show, setShow }: Props) => {
   const navigate = useNavigate();
 
-  const { nftid } = show; //useParams<{ nftid: string }>();
+  const { nft } = show; //useParams<{ nftid: string }>();
   const { Tenk } = useTenkNear();
   const { Auction } = useAuctionNear();
 
   const ft_cheddar = "token-v3.cheddar.testnet";
 
-  const [nft, setNFT] = useState<TokenSale>();
+  const [nfta, setNFT] = useState<TokenSale>();
   const [price, setPrice] = useState<number>(1);
   const [ft, setFT] = useState<string>("NEAR");
 
@@ -61,7 +60,7 @@ export const AuctionCreate = ({ show, setShow }: Props) => {
     }
 
     const args = {
-      token_id: parseInt(nft?.token.token_id!),
+      token_id: parseInt(nfta?.token.token_id!),
       account_id: Auction?.contractId!,
       period: period,
       price: price, // * Math.pow(10, 24): price,
@@ -77,30 +76,10 @@ export const AuctionCreate = ({ show, setShow }: Props) => {
     console.log("auction created");
   };
 
-  const getSaleForNFT = async (nftid: string) => {
-    const nft_contract_token = Auction?.nft_contract_id! + DELIMETER + nftid;
-    const args = { nft_contract_token: nft_contract_token };
-    console.log("args", args);
-    const res: Sale = await Auction?.account.viewFunction(
-      Auction.contractId,
-      "get_sale",
-      args
-    );
-    return res;
-  };
-
   useEffect(() => {
     const getNFTs = async () => {
-      const args = {
-        token_id: nftid,
-      };
-      const token: Token = await Tenk?.account.viewFunction(
-        Tenk.contractId,
-        "nft_token",
-        args
-      );
-      if (token) {
-        let sale = await getSaleForNFT(token.token_id);
+      if (show.nft) {
+        let sale = show.nft.sale;
 
         if (sale) {
           if (sale.ft_token_type == "near") {
@@ -108,7 +87,7 @@ export const AuctionCreate = ({ show, setShow }: Props) => {
           }
         }
         const token_sale = {
-          token: token,
+          token: show.nft.token,
           sale: sale,
         };
         setNFT(token_sale);

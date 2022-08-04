@@ -12,16 +12,22 @@ import { Storage } from "../Storage/Storage";
 export function Main() {
   const { Tenk } = useTenkNear();
   const { Auction } = useAuctionNear();
-  useUserNFTs(Tenk, Auction);
-  useSaleNFTs(Tenk, Auction);
-
+  const userNFTsQuery = useUserNFTs(Tenk, Auction);
+  const saleNFTsQuery = useSaleNFTs(Tenk, Auction);
+  console.log(Tenk);
   return (
     <>
       <Header />
       <Routes>
-        <Route path="/" element={<NFTs />} />
+        <Route
+          path="/myassets"
+          element={<NFTs userNFTsQuery={userNFTsQuery} />}
+        />
         <Route path="/myassets/storage" element={<Storage />} />
-        <Route path="/marketplace" element={<Marketplace />} />
+        <Route
+          path="/"
+          element={<Marketplace saleNFTsQuery={saleNFTsQuery} />}
+        />
       </Routes>
       <Footer />
     </>
