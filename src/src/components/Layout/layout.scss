@@ -340,3 +340,9 @@ button.yellow {
   border: solid #2626264d 1px;
   color: #333;
 }
+
+@media (max-width: 576px) {
+  button {
+    height: 45px;
+  }
+}

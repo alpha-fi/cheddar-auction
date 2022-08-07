@@ -48,7 +48,7 @@ export const Header = () => {
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 26"
-                style={{ width: "24px" }}
+                style={{ width: width < 576 ? "40px" : "24px" }}
               >
                 <path
                   fill="#8542eb"
@@ -69,7 +69,7 @@ export const Header = () => {
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
-                style={{ width: "24px" }}
+                style={{ width: width < 576 ? "40px" : "24px" }}
               >
                 <path
                   fill="#8542eb"

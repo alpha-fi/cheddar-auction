@@ -58,19 +58,32 @@ export const HamburgerMenu = () => {
             width="30px"
           />
         )}
-        <div className={css.link} onClick={() => handleClose("/")}>
+        <div
+          className={css.link}
+          onClick={() => handleClose("/")}
+          style={{
+            background: isMarketplace() ? "#3333" : "",
+          }}
+        >
           <span
-            style={isMarketplace() ? { borderBottom: "2px solid black" } : {}}
+            style={{
+              fontSize: "24px",
+            }}
           >
             Marketplace
           </span>
         </div>
         {wallet && wallet.getAccountId() && (
-          <div className={css.link} onClick={() => handleClose("/myassets")}>
+          <div
+            className={css.link}
+            onClick={() => handleClose("/myassets")}
+            style={{
+              background: !isMarketplace() ? "#3333" : "",
+            }}
+          >
             <span
               style={{
-                borderBottom: !isMarketplace() ? "2px solid black" : "",
-                marginRight: "15px",
+                fontSize: "24px",
               }}
             >
               My&nbsp;Assets
@@ -79,7 +92,7 @@ export const HamburgerMenu = () => {
         )}
         {wallet &&
           (wallet.getAccountId() ? (
-            <div style={{ padding: "8px 8px 8px 32px" }}>
+            <div style={{ padding: "8px 32px 8px 32px" }}>
               <Dropdown
                 trigger={
                   wallet?.getAccountId().length > 16
@@ -95,20 +108,22 @@ export const HamburgerMenu = () => {
               />
             </div>
           ) : (
-            <button className="yellow" onClick={signIn}>
-              Sign In
-            </button>
+            <div style={{ padding: "8px 32px 8px 32px" }}>
+              <button className="yellow" onClick={signIn}>
+                Sign In
+              </button>
+            </div>
           ))}
       </div>
       <button
         className={css.openbtn}
         onClick={handleOpen}
-        style={{ backgroundColor: "#ffd262" }}
+        style={{ backgroundColor: "#ffd262", height: "45px", width: "45px" }}
       >
         <HamburgerMenuIcon
           color="black"
-          height="20px"
-          width="20px"
+          height="30px"
+          width="30px"
           style={{ verticalAlign: "middle" }}
         />
       </button>
