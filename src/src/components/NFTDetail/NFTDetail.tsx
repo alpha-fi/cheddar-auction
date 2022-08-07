@@ -33,6 +33,7 @@ export const NFTDetail = ({ show, setShow }: Props) => {
       };
     });
   };
+  console.log(nft);
 
   return (
     <div>
@@ -52,22 +53,30 @@ export const NFTDetail = ({ show, setShow }: Props) => {
         </div>
         <div className={css.nft_description}>
           <div>
-            <b className="title">DETAIL OF NFT</b>
-            <br />
-            <br />
-            <b className="title">Token ID: {nft?.token_id}</b>
-            <br />
-            <b className="title">Owner: {nft?.owner_id}</b>
-            <br />
-            {false && (
-              <>
-                <b className="title">Title: {nft?.metadata?.title}</b>
-                <br />
-                <b className="title">
-                  Description: {nft?.metadata?.description}
-                </b>
-              </>
-            )}
+            <div>
+              <p style={{ fontSize: "22px" }}>DETAIL OF NFT</p>
+            </div>
+
+            <div>
+              <div>
+                <p>Token ID: {nft?.token_id}</p>
+              </div>
+
+              <div>
+                <p>Owner: {nft?.owner_id}</p>
+              </div>
+              {nft?.metadata?.title && (
+                <div>
+                  <p>Title: {nft?.metadata?.title}</p>
+                </div>
+              )}
+              {nft?.metadata?.description && (
+                <div>
+                  <p>Description: {nft?.metadata?.description}</p>
+                </div>
+              )}
+            </div>
+            <div></div>
           </div>
         </div>
       </div>

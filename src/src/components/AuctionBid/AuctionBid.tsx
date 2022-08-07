@@ -13,6 +13,7 @@ import { FT_CONTRACT_ACCOUNT } from "../Constants/Contracts";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ShowModal } from "../Marketplace/Marketplace";
+import useScreenSize from "../../hooks/useScreenSize";
 const {
   utils: {
     format: { parseNearAmount },
@@ -30,9 +31,10 @@ type Props = {
 };
 
 export const AuctionBid = ({ show, setShow }: Props) => {
-  const nftid = show.nft?.token.token_id; //useParams<{ nftid: string }>();
   const { Tenk } = useTenkNear();
   const { Auction, signIn } = useAuctionNear();
+  const { width } = useScreenSize();
+  const accountLength = width > 992 ? 35 : 20;
 
   const [nft, setNFT] = useState<TokenSale>();
   const [price, setPrice] = useState<number>(1);
@@ -83,27 +85,38 @@ export const AuctionBid = ({ show, setShow }: Props) => {
         const hours = Math.floor((remaining / (1000 * 60 * 60)) % 24);
         const minutes = Math.floor((remaining / 1000 / 60) % 60);
         const seconds = Math.floor((remaining / 1000) % 60);
-
-        if (days > 0)
-          left =
-            days +
-            "Days " +
-            hours +
-            " Hours " +
-            minutes +
-            " Minutes " +
-            seconds +
-            " Seconds";
-        else
-          left =
-            hours + " Hours " + minutes + " Minutes " + seconds + " Seconds";
+        if (width >= 992) {
+          if (days > 0)
+            left =
+              days +
+              " Days " +
+              hours +
+              " Hours " +
+              minutes +
+              " Minutes " +
+              seconds +
+              " Seconds";
+          else
+            left =
+              hours + " Hours " + minutes + " Minutes " + seconds + " Seconds";
+        } else {
+          if (days > 0) {
+            left = `${days} ${days === 1 ? "Day" : "Days"} and ${hours}:${
+              minutes < 10 ? "0" + minutes : minutes
+            }:${seconds < 10 ? "0" + seconds : seconds}`;
+          } else {
+            left = `${hours}:${minutes < 10 ? "0" + minutes : minutes}:${
+              seconds < 10 ? "0" + seconds : seconds
+            }`;
+          }
+        }
       }
       setTimeLeft(left);
     }
   }
 
   const placeBid = async () => {
-    let current_price = nft?.sale?.price;
+    let current_price = (nft?.sale?.price || 0) * Math.pow(10, 24);
     if (nft?.sale?.bids)
       current_price = parseInt(nft.sale.bids[nft.sale.bids.length - 1].price);
 
@@ -171,59 +184,47 @@ export const AuctionBid = ({ show, setShow }: Props) => {
             <div className={css.nft_description}>
               <div>
                 <>
-                  <b
-                    className="title"
-                    style={{ padding: "10% 0", fontSize: "18px" }}
-                  >
-                    PLACE BID
-                  </b>
-                  <br />
-                  <br />
-                  <b className="title">Token ID: {nft?.token.token_id}</b>
-                  <br />
-                  <b className="title">Owner: {nft?.token?.owner_id}</b>
-                  <br />
-                  {false && (
-                    <>
-                      <b className="title">
-                        Description: {nft?.token.metadata?.description}
-                      </b>
-                      <br />
-                    </>
-                  )}
-                  <b className="title">
-                    Initial Price: {nft?.sale?.price?.toFixed(2)}{" "}
-                    {nft?.sale?.ft_token_type == "near" ? "NEAR" : "CHEDDAR"}
-                  </b>
-                  <br />
-                  <b className="title">Remaining: {timeLeft}</b>
-                  <br />
-                  <br />
+                  <div>
+                    <p style={{ fontSize: "22px" }}>PLACE BID</p>
+                  </div>
+
+                  <div>
+                    <div>
+                      <p>Token ID: {nft?.token.token_id}</p>
+                    </div>
+
+                    <div>
+                      <p>Owner: {nft?.token?.owner_id}</p>
+                    </div>
+
+                    {nft?.token.metadata?.description && (
+                      <div>
+                        <p>Description: {nft?.token.metadata?.description}</p>
+                      </div>
+                    )}
+                    <div>
+                      <p>
+                        Initial Price: {nft?.sale?.price?.toFixed(2)}{" "}
+                        {nft?.sale?.ft_token_type == "near"
+                          ? "NEAR"
+                          : "CHEDDAR"}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p>Remaining: {timeLeft}</p>
+                    </div>
+                  </div>
 
                   {nft?.sale?.bids && (
-                    <>
-                      <b
-                        className="title"
-                        style={{ padding: "10% 0", fontSize: "18px" }}
-                      >
-                        Bids
-                      </b>
-                      <br />
+                    <div style={{ justifyContent: "flex-start" }}>
+                      <p style={{ fontSize: "18px", marginTop: "10px" }}>
+                        LAST BID
+                      </p>
+
                       {nft.sale.bids && (
                         <>
-                          <b className="title">
-                            Bid Owner:{" "}
-                            {nft.sale.bids[nft.sale.bids?.length - 1].owner_id
-                              .length > 20
-                              ? nft.sale.bids[
-                                  nft.sale.bids?.length - 1
-                                ].owner_id.substring(0, 20) + "..."
-                              : nft.sale.bids[nft.sale.bids?.length - 1]
-                                  .owner_id}
-                          </b>
-                          <br />
-                          <b className="title">
-                            Bid Price:{" "}
+                          <p>
                             {(
                               parseInt(
                                 nft.sale.bids[nft.sale.bids?.length - 1].price
@@ -232,42 +233,67 @@ export const AuctionBid = ({ show, setShow }: Props) => {
                             {nft.sale?.ft_token_type == "near"
                               ? "NEAR"
                               : "CHEDDAR"}
-                          </b>
-                          <br />
-                          <br />
+                            {" by "}
+                            {nft.sale.bids[nft.sale.bids?.length - 1].owner_id
+                              .length > accountLength
+                              ? nft.sale.bids[
+                                  nft.sale.bids?.length - 1
+                                ].owner_id.substring(0, accountLength) + "..."
+                              : nft.sale.bids[nft.sale.bids?.length - 1]
+                                  .owner_id}
+                          </p>
                         </>
                       )}
-                    </>
+                    </div>
                   )}
 
-                  <b className="title">Price</b>
-                  <br />
-                  <input
-                    type="number"
-                    value={price.toString()}
-                    onChange={(e) => setPrice(parseFloat(e.target.value))}
-                    style={{ marginRight: "10px", width: "100px" }}
-                  />
-
-                  {timeLeft != "Ended" &&
-                    Auction?.account.accountId &&
-                    nft?.token?.owner_id != Auction.account.accountId && (
-                      <button className="purple" onClick={(e) => placeBid()}>
-                        Place Bid
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "flex-start",
+                    }}
+                  >
+                    <p>Price</p>
+                    <input
+                      type="number"
+                      value={price.toString()}
+                      onChange={(e) => setPrice(parseFloat(e.target.value))}
+                      style={{
+                        marginRight: "10px",
+                        width: "70px",
+                        padding: "0 0 0 5px",
+                      }}
+                    />
+                  </div>
+                  <div
+                    style={{
+                      marginTop: "10px",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "flex-end",
+                    }}
+                  >
+                    {timeLeft != "Ended" &&
+                      Auction?.account.accountId &&
+                      nft?.token?.owner_id != Auction.account.accountId && (
+                        <button className="purple" onClick={(e) => placeBid()}>
+                          Place Bid
+                        </button>
+                      )}
+                    {!Auction?.account.accountId && (
+                      <button className="yellow" onClick={signIn}>
+                        Connect Wallet
                       </button>
                     )}
-                  {!Auction?.account.accountId && (
-                    <button className="yellow" onClick={signIn}>
-                      Connect Wallet
-                    </button>
-                  )}
+                  </div>
                 </>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <ToastContainer />
+      <ToastContainer position="top-right" style={{ width: "250px" }} />
     </>
   );
 };

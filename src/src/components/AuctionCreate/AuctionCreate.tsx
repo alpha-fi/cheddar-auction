@@ -125,59 +125,89 @@ export const AuctionCreate = ({ show, setShow }: Props) => {
             </div>
             <div className={css.nft_description}>
               <div>
-                <b className="title" style={{ padding: "10% 0" }}>
-                  CREATE AUCTION
-                </b>
-                <br />
-                <br />
+                <div>
+                  <p style={{ fontSize: "22px" }}>CREATE AUCTION</p>
+                </div>
 
-                <b className="title">Token ID: {nft?.token.token_id}</b>
+                <div>
+                  <p>Token ID: {nft?.token.token_id}</p>
+                </div>
 
-                <br />
-                <br />
+                <div>
+                  <div>
+                    <div>
+                      <p>Price:</p>
+                    </div>
+                    <div>
+                      <input
+                        type="number"
+                        value={price.toString()}
+                        onChange={(e) => setPrice(parseFloat(e.target.value))}
+                        style={{
+                          marginRight: "10px",
+                          width: "200px",
+                          padding: "0 0 0 5px",
+                        }}
+                      />
+                    </div>
+                  </div>
 
-                <b className="title">Price</b>
-                <br />
-                <input
-                  type="number"
-                  value={price.toString()}
-                  onChange={(e) => setPrice(parseFloat(e.target.value))}
-                />
-                <br />
+                  <div>
+                    <div>
+                      <p>Auction Finish Time:</p>
+                    </div>
+                    <div>
+                      <input
+                        type="datetime-local"
+                        value={endtime}
+                        style={{ width: "200px", padding: "0 0 0 5px" }}
+                        onChange={(e) => setEndTime(e.target.value)}
+                      />
+                    </div>
+                  </div>
 
-                <b className="title">Auction Finish Time</b>
-                <br />
-                <input
-                  type="datetime-local"
-                  value={endtime}
-                  onChange={(e) => setEndTime(e.target.value)}
-                />
-                <br />
-
-                <b className="title">FT Type</b>
-                <br />
-                <select onChange={(e) => setFT(e.target.value)}>
-                  <option value="NEAR">NEAR</option>
-                  <option value="CHEDDAR">CHEDDAR</option>
-                </select>
-                <br />
-                <br />
-
-                {nft?.sale ? (
-                  <button className="purple" onClick={(e) => navigate("/")}>
-                    Return
-                  </button>
-                ) : (
-                  <button className="purple" onClick={(e) => onCreateAuction()}>
-                    Create
-                  </button>
-                )}
+                  <div>
+                    <div>
+                      <p>FT Type:</p>
+                    </div>
+                    <div>
+                      <select
+                        onChange={(e) => setFT(e.target.value)}
+                        style={{ padding: "0 0 0 5px", width: "200px" }}
+                      >
+                        <option value="NEAR">NEAR</option>
+                        <option value="CHEDDAR">CHEDDAR</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  style={{
+                    marginTop: "10px",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "flex-end",
+                  }}
+                >
+                  {nft?.sale ? (
+                    <button className="purple" onClick={(e) => navigate("/")}>
+                      Return
+                    </button>
+                  ) : (
+                    <button
+                      className="purple"
+                      onClick={(e) => onCreateAuction()}
+                    >
+                      Create
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <ToastContainer />
+      <ToastContainer position="top-right" style={{ width: "250px" }} />
     </>
   ) : (
     <>

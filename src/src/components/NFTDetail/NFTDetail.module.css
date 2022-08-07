@@ -18,14 +18,21 @@
   flex-grow: 1;
   flex-basis: 50%;
   align-items: center;
-  padding: 20px;
+  padding: 10px;
   max-width: 100%;
   background-color: #ebe7f5;
   color: black;
 }
 
 .nft_description div {
-  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.nft_description div div {
+  height: auto;
 }
 
 .nft_container {
@@ -33,6 +40,15 @@
   flex-direction: column;
   flex-wrap: wrap;
   max-width: 100%;
+}
+
+p {
+  margin: 0;
+  color: #333;
+}
+
+.nft_description button {
+  width: 110px;
 }
 
 @media (min-width: 576px) {
@@ -70,6 +86,7 @@
 
   .nft_description {
     max-width: 50%;
+    padding: 30px;
     padding-left: 50px;
   }
 }
