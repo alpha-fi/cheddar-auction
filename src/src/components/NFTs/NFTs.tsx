@@ -42,9 +42,6 @@ export const NFTs = ({ userNFTsQuery }: Props) => {
     loading: false,
   });
 
-  const { Tenk } = useTenkNear();
-  const { Auction } = useAuctionNear();
-
   const { data: nfts = [] } = userNFTsQuery;
 
   const handleOnClick = (name: string, nft: TokenSale) => {
@@ -85,6 +82,15 @@ export const NFTs = ({ userNFTsQuery }: Props) => {
                       id={"nftcard" + nft.token.token_id}
                       style={{ display: "none" }}
                     >
+                      <div
+                        style={{
+                          textAlign: "center",
+                          background: "#FFD26288",
+                          marginBottom: "10px",
+                        }}
+                      >
+                        <p>NFT ID: {nft.token.token_id}</p>
+                      </div>
                       <img
                         alt="NFT"
                         onLoad={() => {
@@ -99,7 +105,6 @@ export const NFTs = ({ userNFTsQuery }: Props) => {
                         onClick={(e) => handleOnClick("NFTDetail", nft)}
                       />
                       <div className={css.nft_token_info}>
-                        <b className="title">NFT Id:{nft.token.token_id}</b>
                         {nft.sale ? (
                           <button
                             className="purple"
