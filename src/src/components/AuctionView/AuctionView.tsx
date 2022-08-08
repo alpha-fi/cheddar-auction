@@ -11,6 +11,7 @@ import { DELIMETER } from "../NFTs/NFTs";
 import { FT_CONTRACT_ACCOUNT } from "../Constants/Contracts";
 import { ShowModal } from "../Marketplace/Marketplace";
 import useScreenSize from "../../hooks/useScreenSize";
+import Spinner from "../Spinner/Spinner";
 
 interface TokenSale {
   token: Token;
@@ -332,6 +333,7 @@ export const AuctionView = ({ show, setShow }: Props) => {
           </div>
         </div>
       </div>
+      {loading && <Spinner showOverlay={true} />}
     </>
   ) : (
     <>

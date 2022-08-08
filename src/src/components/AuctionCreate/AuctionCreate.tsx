@@ -16,6 +16,7 @@ import { DELIMETER, TokenSale } from "../NFTs/NFTs";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ShowModal } from "../Marketplace/Marketplace";
+import Spinner from "../Spinner/Spinner";
 
 type Props = {
   show: ShowModal;
@@ -34,6 +35,7 @@ export const AuctionCreate = ({ show, setShow }: Props) => {
   const [nfta, setNFT] = useState<TokenSale>();
   const [price, setPrice] = useState<number>(1);
   const [ft, setFT] = useState<string>("NEAR");
+  const [loading, setLoading] = useState<boolean>(false);
 
   const [endtime, setEndTime] = useState<string>(
     new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000)
@@ -46,18 +48,17 @@ export const AuctionCreate = ({ show, setShow }: Props) => {
     var nowTime = new Date().getTime() as u64;
     const period: u64 = endTime - nowTime;
 
-    console.log(nowTime, endTime, period);
-
-    if (period <= 0) {
+    if (period <= 0 || isNaN(period)) {
       console.log("failed to set endTime!");
       toast("failed to set endTime!");
       return;
     }
-    if (price <= 0) {
+    if (price <= 0 || isNaN(price)) {
       console.log("invalid price!");
       toast("invalid price!");
       return;
     }
+    setLoading(true);
 
     const args = {
       token_id: parseInt(nfta?.token.token_id!),
@@ -208,6 +209,7 @@ export const AuctionCreate = ({ show, setShow }: Props) => {
         </div>
       </div>
       <ToastContainer position="top-right" style={{ width: "250px" }} />
+      {loading && <Spinner showOverlay={true} />}
     </>
   ) : (
     <>

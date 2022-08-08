@@ -14,6 +14,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ShowModal } from "../Marketplace/Marketplace";
 import useScreenSize from "../../hooks/useScreenSize";
+import Spinner from "../Spinner/Spinner";
 const {
   utils: {
     format: { parseNearAmount },
@@ -39,6 +40,7 @@ export const AuctionBid = ({ show, setShow }: Props) => {
   const [nft, setNFT] = useState<TokenSale>();
   const [price, setPrice] = useState<number>(1);
   const [timeLeft, setTimeLeft] = useState<string>();
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const getNFTs = async () => {
@@ -124,7 +126,11 @@ export const AuctionBid = ({ show, setShow }: Props) => {
       toast("You can place a bid with less price that current auction price.");
       // console.log("You can place a bid with less price that current auction price.");
       console.log(price, current_price);
+    } else if (isNaN(price)) {
+      toast("You must place a bid.");
     } else {
+      setLoading(true);
+
       if (nft?.sale?.ft_token_type == "near") {
         const args = {
           token_id: nft.token.token_id,
@@ -151,6 +157,13 @@ export const AuctionBid = ({ show, setShow }: Props) => {
 
         const res = await Auction?.offer_cheddar(args, options);
       }
+    }
+  };
+
+  const signInWhitSpinner = () => {
+    if (signIn) {
+      setLoading(true);
+      signIn();
     }
   };
 
@@ -282,7 +295,7 @@ export const AuctionBid = ({ show, setShow }: Props) => {
                         </button>
                       )}
                     {!Auction?.account.accountId && (
-                      <button className="yellow" onClick={signIn}>
+                      <button className="yellow" onClick={signInWhitSpinner}>
                         Connect Wallet
                       </button>
                     )}
@@ -294,6 +307,7 @@ export const AuctionBid = ({ show, setShow }: Props) => {
         </div>
       </div>
       <ToastContainer position="top-right" style={{ width: "250px" }} />
+      {loading && <Spinner showOverlay={true} />}
     </>
   );
 };
