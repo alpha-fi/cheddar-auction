@@ -15,6 +15,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { ShowModal } from "../Marketplace/Marketplace";
 import useScreenSize from "../../hooks/useScreenSize";
 import Spinner from "../Spinner/Spinner";
+import { isValidAmountInput } from "../../helpers";
 const {
   utils: {
     format: { parseNearAmount },
@@ -38,7 +39,7 @@ export const AuctionBid = ({ show, setShow }: Props) => {
   const accountLength = width > 992 ? 35 : 20;
 
   const [nft, setNFT] = useState<TokenSale>();
-  const [price, setPrice] = useState<number>(1);
+  const [price, setPrice] = useState<string>("1");
   const [timeLeft, setTimeLeft] = useState<string>();
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -48,6 +49,7 @@ export const AuctionBid = ({ show, setShow }: Props) => {
         const sale = show.nft.sale;
         if (sale?.bids) {
           let bids = new Map(Object.entries(sale.bids));
+          console.log(bids);
           const sale_view: SaleView = {
             bids: bids.get(sale.ft_token_type),
             created_at: sale.created_at,
@@ -60,12 +62,26 @@ export const AuctionBid = ({ show, setShow }: Props) => {
             token: show.nft.token,
             sale: sale_view,
           };
+          if (sale_view.bids) {
+            setPrice(
+              (
+                parseFloat(sale_view.bids[sale_view.bids.length - 1].price) /
+                  Math.pow(10, 24) +
+                0.05
+              ).toString()
+            );
+          } else {
+            setPrice((sale.price / Math.pow(10, 24) + 0.05).toString());
+          }
           setNFT(token_sale);
-        } else setNFT({ token: show.nft.token });
+        } else {
+          setNFT({ token: show.nft.token });
+          setPrice((sale.price / Math.pow(10, 24) + 0.05).toString());
+        }
       }
     };
     getNFTs();
-  }, [Tenk]);
+  }, []);
 
   useEffect(() => {
     const timeoutId = setTimeout(step, 1000);
@@ -119,14 +135,14 @@ export const AuctionBid = ({ show, setShow }: Props) => {
 
   const placeBid = async () => {
     let current_price = (nft?.sale?.price || 0) * Math.pow(10, 24);
-    if (nft?.sale?.bids)
+    if (nft?.sale?.bids) {
       current_price = parseInt(nft.sale.bids[nft.sale.bids.length - 1].price);
+    }
 
-    if (price * Math.pow(10, 24) <= current_price!) {
+    if (parseFloat(price) * Math.pow(10, 24) <= current_price!) {
       toast("You can place a bid with less price that current auction price.");
       // console.log("You can place a bid with less price that current auction price.");
-      console.log(price, current_price);
-    } else if (isNaN(price)) {
+    } else if (isNaN(parseFloat(price))) {
       toast("You must place a bid.");
     } else {
       setLoading(true);
@@ -134,9 +150,9 @@ export const AuctionBid = ({ show, setShow }: Props) => {
       if (nft?.sale?.ft_token_type == "near") {
         const args = {
           token_id: nft.token.token_id,
-          offer_price: price * Math.pow(10, 24),
+          offer_price: parseFloat(price) * Math.pow(10, 24),
         };
-        const bid_price = parseNearAmount(price.toString());
+        const bid_price = parseNearAmount(price);
         const options = {
           gas: new BN("30000000000000"),
           attachedDeposit: new BN(bid_price!),
@@ -148,7 +164,7 @@ export const AuctionBid = ({ show, setShow }: Props) => {
       } else {
         const args = {
           token_id: nft?.token.token_id!,
-          amount: parseNearAmount(price.toString())!,
+          amount: parseNearAmount(price)!,
         };
         const options = {
           gas: new BN("50000000000000"),
@@ -174,6 +190,12 @@ export const AuctionBid = ({ show, setShow }: Props) => {
         loading: false,
       };
     });
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (isValidAmountInput(e.target.value)) {
+      setPrice(e.target.value);
+    }
   };
 
   return (
@@ -271,7 +293,7 @@ export const AuctionBid = ({ show, setShow }: Props) => {
                     <input
                       type="number"
                       value={price.toString()}
-                      onChange={(e) => setPrice(parseFloat(e.target.value))}
+                      onChange={handleInputChange}
                       style={{
                         marginRight: "10px",
                         width: "70px",
