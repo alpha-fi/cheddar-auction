@@ -90,6 +90,7 @@ export const AuctionCreate = ({ show, setShow }: Props) => {
         const token_sale = {
           token: show.nft.token,
           sale: sale,
+          nftsName: show.nft.nftsName,
         };
         setNFT(token_sale);
       }
@@ -131,7 +132,9 @@ export const AuctionCreate = ({ show, setShow }: Props) => {
                 </div>
 
                 <div>
-                  <p>Token ID: {nft?.token.token_id}</p>
+                  <p>
+                    Name: {nft?.nftsName} {nft?.token.token_id}
+                  </p>
                 </div>
 
                 <div>

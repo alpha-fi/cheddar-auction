@@ -25,6 +25,7 @@ const {
 interface TokenSale {
   token: Token;
   sale?: SaleView;
+  nftsName: string;
 }
 
 type Props = {
@@ -61,6 +62,7 @@ export const AuctionBid = ({ show, setShow }: Props) => {
           const token_sale = {
             token: show.nft.token,
             sale: sale_view,
+            nftsName: show.nft.nftsName,
           };
           if (sale_view.bids) {
             setPrice(
@@ -75,7 +77,7 @@ export const AuctionBid = ({ show, setShow }: Props) => {
           }
           setNFT(token_sale);
         } else {
-          setNFT({ token: show.nft.token });
+          setNFT({ token: show.nft.token, nftsName: show.nft.nftsName });
           setPrice((sale.price / Math.pow(10, 24) + 0.05).toString());
         }
       }
@@ -225,7 +227,9 @@ export const AuctionBid = ({ show, setShow }: Props) => {
 
                   <div>
                     <div>
-                      <p>Token ID: {nft?.token.token_id}</p>
+                      <p>
+                        Name: {nft?.nftsName} {nft?.token.token_id}
+                      </p>
                     </div>
 
                     <div>

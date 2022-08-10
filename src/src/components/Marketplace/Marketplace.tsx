@@ -129,7 +129,9 @@ export const Marketplace = ({ saleNFTsQuery }: Props) => {
                           marginBottom: "10px",
                         }}
                       >
-                        <p>NFT ID: {nft.token.token_id}</p>
+                        <p>
+                          {nft.nftsName} {nft.token.token_id}
+                        </p>
                       </div>
                       <img
                         alt="NFT"

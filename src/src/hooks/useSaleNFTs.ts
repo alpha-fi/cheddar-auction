@@ -19,11 +19,6 @@ const getNFT = async (
     "nft_token",
     args
   );
-  const contractMetadata = await tenk?.account.viewFunction(
-    nftContract,
-    "nft_metadata"
-  );
-  res = { ...res, name: contractMetadata.name };
   return res;
 };
 
@@ -44,23 +39,26 @@ const getAuctions = async (
       "get_sales_by_nft_contract_id",
       args
     );
+
+    const contractMetadata = await tenk?.account.viewFunction(
+      TENK_CONTRACT_ACCOUNT,
+      "nft_metadata"
+    );
     if (res) {
       for (let i = 0; i < res.length; i++) {
-        if (res[i].end_at > Date.now()) {
-          const nft = await getNFT(
-            res[i].token_id,
-            res[i].nft_contract_id,
-            tenk
-          );
-          const token_sale = {
-            sale: res[i],
-            token: nft,
-          };
-          token_sales.push(token_sale);
-        }
+        //if (res[i].end_at > Date.now()) {
+        const nft = await getNFT(res[i].token_id, res[i].nft_contract_id, tenk);
+        const token_sale = {
+          sale: res[i],
+          token: nft,
+          nftsName: contractMetadata.name,
+        };
+        token_sales.push(token_sale);
+        //}
       }
     }
   }
+  console.log(token_sales);
   return token_sales;
 };
 

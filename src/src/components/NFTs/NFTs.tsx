@@ -29,6 +29,7 @@ const StyledContent = styled("div", {
 export interface TokenSale {
   token: Token;
   sale?: Sale;
+  nftsName: string;
 }
 
 type Props = {
@@ -89,7 +90,9 @@ export const NFTs = ({ userNFTsQuery }: Props) => {
                           marginBottom: "10px",
                         }}
                       >
-                        <p>NFT ID: {nft.token.token_id}</p>
+                        <p>
+                          {nft.nftsName} {nft.token.token_id}
+                        </p>
                       </div>
                       <img
                         alt="NFT"

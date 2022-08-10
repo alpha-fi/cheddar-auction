@@ -5,6 +5,7 @@ import { Token } from "../../near/contracts/tenk/index";
 import css from "./NFTDetail.module.css";
 import Spinner from "../Spinner/Spinner";
 import { ShowModal } from "../Marketplace/Marketplace";
+import { TokenSale } from "../NFTs/NFTs";
 
 type Props = {
   show: ShowModal;
@@ -14,12 +15,12 @@ type Props = {
 export const NFTDetail = ({ show, setShow }: Props) => {
   const { Tenk } = useTenkNear();
 
-  const [nft, setNFT] = useState<Token>();
+  const [nft, setNFT] = useState<TokenSale>();
 
   useEffect(() => {
     const getNFTs = async () => {
       if (show.nft) {
-        setNFT(show.nft.token);
+        setNFT({ token: show.nft.token, nftsName: show.nft.nftsName });
       }
     };
     getNFTs();
@@ -47,7 +48,7 @@ export const NFTDetail = ({ show, setShow }: Props) => {
             alt="NFT"
             src={
               "https://bafybeibghcllcmurku7lxyg4wgxn2zsu5qqk7h4r6bmyhpztmyd564cx54.ipfs.nftstorage.link/" +
-              nft?.metadata?.media
+              nft?.token.metadata?.media
             }
           />
         </div>
@@ -59,20 +60,22 @@ export const NFTDetail = ({ show, setShow }: Props) => {
 
             <div>
               <div>
-                <p>Token ID: {nft?.token_id}</p>
+                <p>
+                  Name: {nft?.nftsName} {nft?.token.token_id}
+                </p>
               </div>
 
               <div>
-                <p>Owner: {nft?.owner_id}</p>
+                <p>Owner: {nft?.token.owner_id}</p>
               </div>
-              {nft?.metadata?.title && (
+              {nft?.token.metadata?.title && (
                 <div>
-                  <p>Title: {nft?.metadata?.title}</p>
+                  <p>Title: {nft?.token.metadata?.title}</p>
                 </div>
               )}
-              {nft?.metadata?.description && (
+              {nft?.token.metadata?.description && (
                 <div>
-                  <p>Description: {nft?.metadata?.description}</p>
+                  <p>Description: {nft?.token.metadata?.description}</p>
                 </div>
               )}
             </div>

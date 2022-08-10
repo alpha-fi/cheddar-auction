@@ -16,6 +16,7 @@ import Spinner from "../Spinner/Spinner";
 interface TokenSale {
   token: Token;
   sale?: SaleView;
+  nftsName: string;
 }
 
 type Props = {
@@ -59,10 +60,11 @@ export const AuctionView = ({ show, setShow }: Props) => {
           const token_sale = {
             token: show.nft.token,
             sale: sale_view,
+            nftsName: show.nft.nftsName,
           };
           setNFT(token_sale);
         } else {
-          setNFT({ token: show.nft.token });
+          setNFT({ token: show.nft.token, nftsName: show.nft.nftsName });
         }
       }
     };
@@ -229,7 +231,9 @@ export const AuctionView = ({ show, setShow }: Props) => {
 
                 <div>
                   <div>
-                    <p>Token ID: {nft?.token.token_id}</p>
+                    <p>
+                      Name: {nft?.nftsName} {nft?.token.token_id}
+                    </p>
                   </div>
 
                   {nft?.token.metadata?.description && (

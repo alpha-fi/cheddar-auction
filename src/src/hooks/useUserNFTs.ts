@@ -32,11 +32,15 @@ const getAuctions = async (
       from_index: "0",
       limit: 50,
     };
-
+    console.log(tenk.account);
     const res: Token[] = await tenk.account.viewFunction(
       tenk.contractId,
       "nft_tokens_for_owner",
       args
+    );
+    const contractMetadata = await tenk?.account.viewFunction(
+      TENK_CONTRACT_ACCOUNT,
+      "nft_metadata"
     );
     if (res) {
       for (let i = 0; i < res.length; i++) {
@@ -44,6 +48,7 @@ const getAuctions = async (
         const token_sale = {
           token: res[i],
           sale: sale,
+          nftsName: contractMetadata.name,
         };
         token_sales.push(token_sale);
       }
