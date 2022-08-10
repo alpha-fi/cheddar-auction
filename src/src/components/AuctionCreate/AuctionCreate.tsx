@@ -140,6 +140,21 @@ export const AuctionCreate = ({ show, setShow }: Props) => {
                 <div>
                   <div>
                     <div>
+                      <p>FT Type:</p>
+                    </div>
+                    <div>
+                      <select
+                        onChange={(e) => setFT(e.target.value)}
+                        style={{ padding: "0 0 0 5px", width: "200px" }}
+                      >
+                        <option value="NEAR">NEAR</option>
+                        <option value="CHEDDAR">CHEDDAR</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div>
                       <p>Price:</p>
                     </div>
                     <div>
@@ -167,21 +182,6 @@ export const AuctionCreate = ({ show, setShow }: Props) => {
                         style={{ width: "200px", padding: "0 0 0 5px" }}
                         onChange={(e) => setEndTime(e.target.value)}
                       />
-                    </div>
-                  </div>
-
-                  <div>
-                    <div>
-                      <p>FT Type:</p>
-                    </div>
-                    <div>
-                      <select
-                        onChange={(e) => setFT(e.target.value)}
-                        style={{ padding: "0 0 0 5px", width: "200px" }}
-                      >
-                        <option value="NEAR">NEAR</option>
-                        <option value="CHEDDAR">CHEDDAR</option>
-                      </select>
                     </div>
                   </div>
                 </div>
