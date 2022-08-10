@@ -217,7 +217,7 @@ export const AuctionBid = ({ show, setShow }: Props) => {
                     )}
                     <div>
                       <p>
-                        Initial Price: {nft?.sale?.price?.toFixed(2)}{" "}
+                        Starting Bid: {nft?.sale?.price?.toFixed(2)}{" "}
                         {nft?.sale?.ft_token_type == "near"
                           ? "NEAR"
                           : "CHEDDAR"}
