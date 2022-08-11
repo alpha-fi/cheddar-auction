@@ -1,5 +1,5 @@
 import { useQuery } from "react-query";
-import { Sale } from "../near/contracts/auction/index";
+import { Bid, Sale } from "../near/contracts/auction/index";
 import { TenkContract, Token } from "../near/contracts/tenk";
 import { AuctionContract } from "../near/contracts/auction";
 import {
@@ -32,7 +32,6 @@ const getAuctions = async (
       from_index: "0",
       limit: 50,
     };
-    console.log(tenk.account);
     const res: Token[] = await tenk.account.viewFunction(
       tenk.contractId,
       "nft_tokens_for_owner",
@@ -45,9 +44,24 @@ const getAuctions = async (
     if (res) {
       for (let i = 0; i < res.length; i++) {
         const sale: Sale = await getSaleForNFT(res[i].token_id, auction);
+        const bids: Bid[] = sale.bids
+          ? new Map<string, Bid[]>(Object.entries(sale.bids)).get(
+              sale.ft_token_type
+            ) || []
+          : [];
+
         const token_sale = {
           token: res[i],
-          sale: sale,
+          sale: {
+            ...sale,
+            bids_length: bids.length,
+            last_bid_price:
+              bids.length > 0
+                ? (
+                    parseInt(bids[bids.length - 1].price) / Math.pow(10, 24)
+                  ).toFixed(2)
+                : undefined,
+          },
           nftsName: contractMetadata.name,
         };
         token_sales.push(token_sale);

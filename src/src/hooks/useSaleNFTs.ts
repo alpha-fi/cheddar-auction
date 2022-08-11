@@ -1,5 +1,5 @@
 import { useQuery } from "react-query";
-import { Sale } from "../near/contracts/auction/index";
+import { Bid, Sale } from "../near/contracts/auction/index";
 import { TenkContract, Token } from "../near/contracts/tenk";
 import { AuctionContract } from "../near/contracts/auction";
 import {
@@ -8,11 +8,7 @@ import {
 } from "../components/Constants/Contracts";
 import { TokenSale } from "../components";
 
-const getNFT = async (
-  nftid: string,
-  nftContract: string,
-  tenk: TenkContract
-) => {
+const getNFT = async (nftid: string, tenk: TenkContract) => {
   const args = { token_id: nftid };
   let res: Token = await tenk.account.viewFunction(
     tenk.contractId,
@@ -46,19 +42,33 @@ const getAuctions = async (
     );
     if (res) {
       for (let i = 0; i < res.length; i++) {
-        //if (res[i].end_at > Date.now()) {
-        const nft = await getNFT(res[i].token_id, res[i].nft_contract_id, tenk);
-        const token_sale = {
-          sale: res[i],
-          token: nft,
-          nftsName: contractMetadata.name,
-        };
-        token_sales.push(token_sale);
-        //}
+        const bids: Bid[] =
+          new Map<string, Bid[]>(Object.entries(res[i].bids)).get(
+            res[i].ft_token_type
+          ) || [];
+
+        if (parseFloat(res[i].end_at) > Date.now()) {
+          const nft = await getNFT(res[i].token_id, tenk);
+
+          const token_sale = {
+            sale: {
+              ...res[i],
+              bids_length: bids.length,
+              last_bid_price:
+                bids.length > 0
+                  ? (
+                      parseInt(bids[bids.length - 1].price) / Math.pow(10, 24)
+                    ).toFixed(2)
+                  : undefined,
+            },
+            token: nft,
+            nftsName: contractMetadata.name,
+          };
+          token_sales.push(token_sale);
+        }
       }
     }
   }
-  console.log(token_sales);
   return token_sales;
 };
 

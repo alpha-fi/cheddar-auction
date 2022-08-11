@@ -34,7 +34,6 @@ export const NFTDetail = ({ show, setShow }: Props) => {
       };
     });
   };
-  console.log(nft);
 
   return (
     <div>

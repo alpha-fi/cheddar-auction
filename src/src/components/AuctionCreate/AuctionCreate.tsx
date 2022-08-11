@@ -49,12 +49,10 @@ export const AuctionCreate = ({ show, setShow }: Props) => {
     const period: u64 = endTime - nowTime;
 
     if (period <= 0 || isNaN(period)) {
-      console.log("failed to set endTime!");
       toast("failed to set endTime!");
       return;
     }
     if (price <= 0 || isNaN(price)) {
-      console.log("invalid price!");
       toast("invalid price!");
       return;
     }
@@ -74,7 +72,6 @@ export const AuctionCreate = ({ show, setShow }: Props) => {
     };
 
     await Auction?.create_auction(args, options);
-    console.log("auction created");
   };
 
   useEffect(() => {

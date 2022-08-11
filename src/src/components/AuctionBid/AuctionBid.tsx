@@ -50,7 +50,6 @@ export const AuctionBid = ({ show, setShow }: Props) => {
         const sale = show.nft.sale;
         if (sale?.bids) {
           let bids = new Map(Object.entries(sale.bids));
-          console.log(bids);
           const sale_view: SaleView = {
             bids: bids.get(sale.ft_token_type),
             created_at: sale.created_at,
@@ -70,15 +69,21 @@ export const AuctionBid = ({ show, setShow }: Props) => {
                 parseFloat(sale_view.bids[sale_view.bids.length - 1].price) /
                   Math.pow(10, 24) +
                 0.05
-              ).toString()
+              )
+                .toFixed(2)
+                .toString()
             );
           } else {
-            setPrice((sale.price / Math.pow(10, 24) + 0.05).toString());
+            setPrice(
+              (sale.price / Math.pow(10, 24) + 0.05).toFixed(2).toString()
+            );
           }
           setNFT(token_sale);
         } else {
           setNFT({ token: show.nft.token, nftsName: show.nft.nftsName });
-          setPrice((sale.price / Math.pow(10, 24) + 0.05).toString());
+          setPrice(
+            (sale.price / Math.pow(10, 24) + 0.05).toFixed(2).toString()
+          );
         }
       }
     };
@@ -143,7 +148,6 @@ export const AuctionBid = ({ show, setShow }: Props) => {
 
     if (parseFloat(price) * Math.pow(10, 24) <= current_price!) {
       toast("You can place a bid with less price that current auction price.");
-      // console.log("You can place a bid with less price that current auction price.");
     } else if (isNaN(parseFloat(price))) {
       toast("You must place a bid.");
     } else {
@@ -161,8 +165,6 @@ export const AuctionBid = ({ show, setShow }: Props) => {
         };
 
         const res = await Auction?.offer(args, options);
-
-        console.log(res);
       } else {
         const args = {
           token_id: nft?.token.token_id!,
@@ -251,7 +253,7 @@ export const AuctionBid = ({ show, setShow }: Props) => {
                     </div>
 
                     <div>
-                      <p>Remaining: {timeLeft}</p>
+                      <p>Time Left: {timeLeft ?? "Loading..."}</p>
                     </div>
                   </div>
 
