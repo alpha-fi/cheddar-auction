@@ -37,14 +37,13 @@ static DELIMETER: &str = "||";
 pub type TokenType = Option<String>;
 pub type FungibleTokenId = AccountId;
 pub type ContractAndTokenId = String;
-// TODO: Capital U128
 pub type Payout = HashMap<AccountId, U128>;
 
 #[derive(Serialize, Deserialize)]
 #[serde(crate = "near_sdk::serde")]
 pub struct PayoutResult {
     pub payout: Payout,
-    pub with_cheddar: Option<bool>,
+    //pub with_cheddar: Option<bool>,
 }
 
 

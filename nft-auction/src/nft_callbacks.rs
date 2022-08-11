@@ -1,6 +1,12 @@
 use crate::*;
 /// approval callbacks from NFT Contracts
 
+/// should check auction duration
+const EXTENSION_DURATION : u64 = 15 * 60 * 1000; //15 minutes
+const MAX_DURATION: u64 = 1000 * 60 * 60 * 24 * 1000; // 1000 days
+
+
+
 #[derive(Serialize, Deserialize)]
 #[serde(crate = "near_sdk::serde")]
 pub struct SaleArgs {
@@ -34,6 +40,8 @@ impl NonFungibleTokenApprovalsReceiver for Contract {
         // enforce cross contract call and owner_id is signer
         let SaleArgs { period, token_type, price, nft_contract_id } = 
             near_sdk::serde_json::from_str(&msg).expect("Not valid SaleArgs");
+        
+        assert!(nft_contract_id == env::predecessor_account_id());
 
         let signer_id = env::signer_account_id();
         assert_ne!(
@@ -46,14 +54,16 @@ impl NonFungibleTokenApprovalsReceiver for Contract {
             &signer_id,
             "owner_id should be signer_id"
         );
-        assert_eq!(
-            period > 0,
-            true,
-            "end time must bigger than now"
+        assert!(
+            period > EXTENSION_DURATION,
+            "auction period must be more then {} milliSeconds", EXTENSION_DURATION
         );
-        assert_eq!(
+        assert!(
+            period < MAX_DURATION,
+            "auction period must be less then {} milliSeconds", MAX_DURATION
+        );
+        assert!(
             price > 0,
-            true,
             "price must be bigger than zero"
         );
 
@@ -78,7 +88,7 @@ impl NonFungibleTokenApprovalsReceiver for Contract {
                     nft_contract_id: nft_contract_id.to_string(),
                     token_id: token_id.clone(),
                     price: price_real,
-                    created_at: U64(env::block_timestamp()/1000000),
+                    created_at: U64(created_at),
                     end_at,
                     ft_token_type: token_type,
                     bids: HashMap::new(),
