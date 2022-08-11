@@ -5,12 +5,15 @@ import useNear from "../../hooks/useTenkNear";
 import { Dropdown } from "../Dropdown/Dropdown";
 import { HamburgerMenu } from "../HamburgerMenu/HamburguerMenu";
 import useScreenSize from "../../hooks/useScreenSize";
+import { useState } from "react";
+import Spinner from "../Spinner/Spinner";
 
 export const Header = () => {
   let navigate = useNavigate();
 
   const location = useLocation();
   const currentPath = location.pathname;
+  const [loading, setLoading] = useState<boolean>(false);
 
   const { wallet, signIn, signOut } = useNear();
 
@@ -26,6 +29,13 @@ export const Header = () => {
     navigate("/");
     if (signOut) {
       signOut();
+    }
+  };
+
+  const signInWhitSpinner = () => {
+    if (signIn) {
+      setLoading(true);
+      signIn();
     }
   };
 
@@ -48,7 +58,7 @@ export const Header = () => {
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 26"
-                style={{ width: "24px" }}
+                style={{ width: width < 576 ? "40px" : "24px" }}
               >
                 <path
                   fill="#8542eb"
@@ -69,7 +79,7 @@ export const Header = () => {
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
-                style={{ width: "24px" }}
+                style={{ width: width < 576 ? "40px" : "24px" }}
               >
                 <path
                   fill="#8542eb"
@@ -131,7 +141,7 @@ export const Header = () => {
                   ]}
                 />
               ) : (
-                <button className="yellow" onClick={signIn}>
+                <button className="yellow" onClick={signInWhitSpinner}>
                   Sign In
                 </button>
               ))}
@@ -149,6 +159,7 @@ export const Header = () => {
           )}
         </div>
       </div>
+      {loading && <Spinner showOverlay={true} />}
     </nav>
   );
 };

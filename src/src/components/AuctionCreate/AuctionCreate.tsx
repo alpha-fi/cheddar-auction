@@ -16,6 +16,7 @@ import { DELIMETER, TokenSale } from "../NFTs/NFTs";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ShowModal } from "../Marketplace/Marketplace";
+import Spinner from "../Spinner/Spinner";
 
 type Props = {
   show: ShowModal;
@@ -34,6 +35,7 @@ export const AuctionCreate = ({ show, setShow }: Props) => {
   const [nfta, setNFT] = useState<TokenSale>();
   const [price, setPrice] = useState<number>(1);
   const [ft, setFT] = useState<string>("NEAR");
+  const [loading, setLoading] = useState<boolean>(false);
 
   const [endtime, setEndTime] = useState<string>(
     new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000)
@@ -46,18 +48,15 @@ export const AuctionCreate = ({ show, setShow }: Props) => {
     var nowTime = new Date().getTime() as u64;
     const period: u64 = endTime - nowTime;
 
-    console.log(nowTime, endTime, period);
-
-    if (period <= 0) {
-      console.log("failed to set endTime!");
+    if (period <= 0 || isNaN(period)) {
       toast("failed to set endTime!");
       return;
     }
-    if (price <= 0) {
-      console.log("invalid price!");
+    if (price <= 0 || isNaN(price)) {
       toast("invalid price!");
       return;
     }
+    setLoading(true);
 
     const args = {
       token_id: parseInt(nfta?.token.token_id!),
@@ -73,7 +72,6 @@ export const AuctionCreate = ({ show, setShow }: Props) => {
     };
 
     await Auction?.create_auction(args, options);
-    console.log("auction created");
   };
 
   useEffect(() => {
@@ -89,6 +87,7 @@ export const AuctionCreate = ({ show, setShow }: Props) => {
         const token_sale = {
           token: show.nft.token,
           sale: sale,
+          nftsName: show.nft.nftsName,
         };
         setNFT(token_sale);
       }
@@ -125,59 +124,92 @@ export const AuctionCreate = ({ show, setShow }: Props) => {
             </div>
             <div className={css.nft_description}>
               <div>
-                <b className="title" style={{ padding: "10% 0" }}>
-                  CREATE AUCTION
-                </b>
-                <br />
-                <br />
+                <div>
+                  <p style={{ fontSize: "22px" }}>CREATE AUCTION</p>
+                </div>
 
-                <b className="title">Token ID: {nft?.token.token_id}</b>
+                <div>
+                  <p>
+                    Name: {nft?.nftsName} {nft?.token.token_id}
+                  </p>
+                </div>
 
-                <br />
-                <br />
+                <div>
+                  <div>
+                    <div>
+                      <p>FT Type:</p>
+                    </div>
+                    <div>
+                      <select
+                        onChange={(e) => setFT(e.target.value)}
+                        style={{ padding: "0 0 0 5px", width: "200px" }}
+                      >
+                        <option value="NEAR">NEAR</option>
+                        <option value="CHEDDAR">CHEDDAR</option>
+                      </select>
+                    </div>
+                  </div>
 
-                <b className="title">Price</b>
-                <br />
-                <input
-                  type="number"
-                  value={price.toString()}
-                  onChange={(e) => setPrice(parseFloat(e.target.value))}
-                />
-                <br />
+                  <div>
+                    <div>
+                      <p>Price:</p>
+                    </div>
+                    <div>
+                      <input
+                        type="number"
+                        value={price.toString()}
+                        onChange={(e) => setPrice(parseFloat(e.target.value))}
+                        style={{
+                          marginRight: "10px",
+                          width: "200px",
+                          padding: "0 0 0 5px",
+                        }}
+                      />
+                    </div>
+                  </div>
 
-                <b className="title">Auction Finish Time</b>
-                <br />
-                <input
-                  type="datetime-local"
-                  value={endtime}
-                  onChange={(e) => setEndTime(e.target.value)}
-                />
-                <br />
-
-                <b className="title">FT Type</b>
-                <br />
-                <select onChange={(e) => setFT(e.target.value)}>
-                  <option value="NEAR">NEAR</option>
-                  <option value="CHEDDAR">CHEDDAR</option>
-                </select>
-                <br />
-                <br />
-
-                {nft?.sale ? (
-                  <button className="purple" onClick={(e) => navigate("/")}>
-                    Return
-                  </button>
-                ) : (
-                  <button className="purple" onClick={(e) => onCreateAuction()}>
-                    Create
-                  </button>
-                )}
+                  <div>
+                    <div>
+                      <p>Auction Finish Time:</p>
+                    </div>
+                    <div>
+                      <input
+                        type="datetime-local"
+                        value={endtime}
+                        style={{ width: "200px", padding: "0 0 0 5px" }}
+                        onChange={(e) => setEndTime(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  style={{
+                    marginTop: "10px",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "flex-end",
+                  }}
+                >
+                  {nft?.sale ? (
+                    <button className="purple" onClick={(e) => navigate("/")}>
+                      Return
+                    </button>
+                  ) : (
+                    <button
+                      className="purple"
+                      onClick={(e) => onCreateAuction()}
+                    >
+                      Create
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <ToastContainer />
+      <ToastContainer position="top-right" style={{ width: "250px" }} />
+      {loading && <Spinner showOverlay={true} />}
     </>
   ) : (
     <>

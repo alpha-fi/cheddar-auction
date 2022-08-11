@@ -1,8 +1,10 @@
+import { useEffect, useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import useAuctionNear from "../../hooks/useAuctionNear";
 import { useSaleNFTs } from "../../hooks/useSaleNFTs";
 import useTenkNear from "../../hooks/useTenkNear";
 import { useUserNFTs } from "../../hooks/useUserNFTs";
+import ErrorModal from "../ErrorModal/ErrorModal";
 import { Footer } from "../Footer/Footer";
 import { Header } from "../Header/Header";
 import { Marketplace } from "../Marketplace/Marketplace";
@@ -14,6 +16,15 @@ export function Main() {
   const { Auction } = useAuctionNear();
   const userNFTsQuery = useUserNFTs(Tenk, Auction);
   const saleNFTsQuery = useSaleNFTs(Tenk, Auction);
+  const [error, setError] = useState("");
+
+  const params = new URLSearchParams(window.location.search);
+
+  useEffect(() => {
+    if (params.get("errorCode")) {
+      setError(params.get("errorCode") ?? "");
+    }
+  }, []);
 
   return (
     <>
@@ -30,6 +41,7 @@ export function Main() {
         />
       </Routes>
       <Footer />
+      <ErrorModal error={error} setError={setError} />
     </>
   );
 }

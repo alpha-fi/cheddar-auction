@@ -29,6 +29,7 @@ const StyledContent = styled("div", {
 export interface TokenSale {
   token: Token;
   sale?: Sale;
+  nftsName: string;
 }
 
 type Props = {
@@ -41,9 +42,6 @@ export const NFTs = ({ userNFTsQuery }: Props) => {
     nft: null,
     loading: false,
   });
-
-  const { Tenk } = useTenkNear();
-  const { Auction } = useAuctionNear();
 
   const { data: nfts = [] } = userNFTsQuery;
 
@@ -83,23 +81,39 @@ export const NFTs = ({ userNFTsQuery }: Props) => {
                     <div
                       className={css.nft_token}
                       id={"nftcard" + nft.token.token_id}
-                      style={{ display: "none" }}
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "space-between",
+                      }}
                     >
-                      <img
-                        alt="NFT"
-                        onLoad={() => {
-                          document
-                            .getElementById("nftcard" + nft.token.token_id)
-                            ?.setAttribute("style", "display: inherit");
-                        }}
-                        src={
-                          "https://bafybeibghcllcmurku7lxyg4wgxn2zsu5qqk7h4r6bmyhpztmyd564cx54.ipfs.nftstorage.link/" +
-                          nft.token.metadata?.media
-                        }
-                        onClick={(e) => handleOnClick("NFTDetail", nft)}
-                      />
+                      <div>
+                        <div
+                          style={{
+                            textAlign: "center",
+                            background: "#FFD26288",
+                            marginBottom: "10px",
+                          }}
+                        >
+                          <p>
+                            {nft.nftsName} {nft.token.token_id}
+                          </p>
+                        </div>
+                        <img
+                          alt="NFT"
+                          onLoad={() => {
+                            document
+                              .getElementById("nftcard" + nft.token.token_id)
+                              ?.setAttribute("style", "display: inherit");
+                          }}
+                          src={
+                            "https://bafybeibghcllcmurku7lxyg4wgxn2zsu5qqk7h4r6bmyhpztmyd564cx54.ipfs.nftstorage.link/" +
+                            nft.token.metadata?.media
+                          }
+                          onClick={(e) => handleOnClick("NFTDetail", nft)}
+                        />
+                      </div>
                       <div className={css.nft_token_info}>
-                        <b className="title">NFT Id:{nft.token.token_id}</b>
                         {nft.sale ? (
                           <button
                             className="purple"

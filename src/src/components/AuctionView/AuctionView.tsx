@@ -10,10 +10,13 @@ import css from "../NFTDetail/NFTDetail.module.css";
 import { DELIMETER } from "../NFTs/NFTs";
 import { FT_CONTRACT_ACCOUNT } from "../Constants/Contracts";
 import { ShowModal } from "../Marketplace/Marketplace";
+import useScreenSize from "../../hooks/useScreenSize";
+import Spinner from "../Spinner/Spinner";
 
 interface TokenSale {
   token: Token;
   sale?: SaleView;
+  nftsName: string;
 }
 
 type Props = {
@@ -29,9 +32,10 @@ export const AuctionView = ({ show, setShow }: Props) => {
   }
   const navigate = useNavigate();
 
-  const nftid = show.nft?.token.token_id; //useParams<{ nftid: string }>();
   const { Tenk } = useTenkNear();
   const { Auction } = useAuctionNear();
+  const { width } = useScreenSize();
+  const accountLength = width > 992 ? 35 : 20;
 
   const [nft, setNFT] = useState<TokenSale>();
   const [loading, setLoading] = useState<boolean>(false);
@@ -56,10 +60,11 @@ export const AuctionView = ({ show, setShow }: Props) => {
           const token_sale = {
             token: show.nft.token,
             sale: sale_view,
+            nftsName: show.nft.nftsName,
           };
           setNFT(token_sale);
         } else {
-          setNFT({ token: show.nft.token });
+          setNFT({ token: show.nft.token, nftsName: show.nft.nftsName });
         }
       }
     };
@@ -86,19 +91,31 @@ export const AuctionView = ({ show, setShow }: Props) => {
         const minutes = Math.floor((remaining / 1000 / 60) % 60);
         const seconds = Math.floor((remaining / 1000) % 60);
 
-        if (days > 0)
-          left =
-            days +
-            "Days " +
-            hours +
-            " Hours " +
-            minutes +
-            " Minutes " +
-            seconds +
-            " Seconds";
-        else
-          left =
-            hours + " Hours " + minutes + " Minutes " + seconds + " Seconds";
+        if (width >= 992) {
+          if (days > 0)
+            left =
+              days +
+              " Days " +
+              hours +
+              " Hours " +
+              minutes +
+              " Minutes " +
+              seconds +
+              " Seconds";
+          else
+            left =
+              hours + " Hours " + minutes + " Minutes " + seconds + " Seconds";
+        } else {
+          if (days > 0) {
+            left = `${days} ${days === 1 ? "Day" : "Days"} and ${hours}:${
+              minutes < 10 ? "0" + minutes : minutes
+            }:${seconds < 10 ? "0" + seconds : seconds}`;
+          } else {
+            left = `${hours}:${minutes < 10 ? "0" + minutes : minutes}:${
+              seconds < 10 ? "0" + seconds : seconds
+            }`;
+          }
+        }
       }
       setTimeLeft(left);
 
@@ -208,92 +225,89 @@ export const AuctionView = ({ show, setShow }: Props) => {
             </div>
             <div className={css.nft_description}>
               <div>
-                <b
-                  className="title"
-                  style={{ padding: "10% 0", fontSize: "18px" }}
-                >
-                  VIEW AUCTION
-                </b>
-                <br />
-                <br />
+                <div>
+                  <p style={{ fontSize: "22px" }}>VIEW AUCTION</p>
+                </div>
 
-                <b className="title">Token ID: {nft?.token.token_id}</b>
-                <br />
-                {false && (
-                  <>
-                    <b className="title">
-                      Description: {nft?.token.metadata?.description}
-                    </b>
-                    <br />
-                  </>
-                )}
-                {nft?.sale && !loading && status == NFT_STATUS.ONAUCTION && (
-                  <>
-                    <b className="title">
-                      Initial Price: {(nft?.sale.price).toFixed(2)}
-                    </b>{" "}
-                    {nft.sale?.ft_token_type == "near" ? "NEAR" : "CHEDDAR"}
-                    <br />
-                    <b className="title">Remaining: {timeLeft}</b>
-                    <br />
-                    <br />
-                  </>
-                )}
+                <div>
+                  <div>
+                    <p>
+                      Name: {nft?.nftsName} {nft?.token.token_id}
+                    </p>
+                  </div>
 
-                {nft?.sale?.bids && (
-                  <>
-                    <b
-                      className="title"
-                      style={{ padding: "10% 0", fontSize: "18px" }}
-                    >
-                      Bid
-                    </b>
-                    <br />
-                    {nft.sale.bids && (
-                      <>
-                        <b className="title">
-                          Bid Owner:{" "}
-                          {nft.sale.bids[nft.sale.bids?.length - 1].owner_id
-                            .length > 20
-                            ? nft.sale.bids[
-                                nft.sale.bids?.length - 1
-                              ].owner_id.substring(0, 20) + "..."
-                            : nft.sale.bids[nft.sale.bids?.length - 1].owner_id}
-                        </b>
-                        <br />
-                        <b className="title">
-                          Bid Price:{" "}
-                          {(
-                            parseInt(
-                              nft.sale.bids[nft.sale.bids?.length - 1].price
-                            ) / Math.pow(10, 24)
-                          ).toFixed(2)}{" "}
+                  {nft?.token.metadata?.description && (
+                    <>
+                      <div>
+                        <p>Description: {nft?.token.metadata?.description}</p>
+                      </div>
+                    </>
+                  )}
+                  {nft?.sale && !loading && status == NFT_STATUS.ONAUCTION && (
+                    <>
+                      <div>
+                        <p>
+                          Starting Bid: {(nft?.sale.price).toFixed(2)}{" "}
                           {nft.sale?.ft_token_type == "near"
                             ? "NEAR"
                             : "CHEDDAR"}
-                        </b>
-                        <br />
-                      </>
+                        </p>
+                      </div>{" "}
+                      <div>
+                        <p>Remaining: {timeLeft ?? "Loading..."}</p>
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {nft?.sale?.bids && (
+                  <div>
+                    <p style={{ fontSize: "18px", marginTop: "10px" }}>
+                      LAST BID
+                    </p>
+
+                    {nft.sale.bids && (
+                      <p>
+                        {(
+                          parseInt(
+                            nft.sale.bids[nft.sale.bids?.length - 1].price
+                          ) / Math.pow(10, 24)
+                        ).toFixed(2)}{" "}
+                        {nft.sale?.ft_token_type == "near" ? "NEAR" : "CHEDDAR"}
+                        {" by "}
+                        {nft.sale.bids[nft.sale.bids?.length - 1].owner_id
+                          .length > accountLength
+                          ? nft.sale.bids[
+                              nft.sale.bids?.length - 1
+                            ].owner_id.substring(0, accountLength) + "..."
+                          : nft.sale.bids[nft.sale.bids?.length - 1].owner_id}
+                      </p>
                     )}
-                  </>
+                  </div>
                 )}
 
                 {status == NFT_STATUS.ONAUCTION && !nft?.sale && (
                   <>
-                    <b className="title">SALED</b>
-                    <br />
+                    <div>
+                      <p>Status: SALED</p>
+                    </div>
+
                     <button className="purple" onClick={(e) => navigate("/")}>
-                      RETURN
+                      Return
                     </button>
-                    <br />
                   </>
                 )}
-
-                {nft?.sale && nft.token.owner_id == Tenk?.account.accountId && (
-                  <>
-                    {nft.sale.bids && (
-                      <>
-                        <br />
+                <div
+                  style={{
+                    flexDirection: "row",
+                    height: "auto",
+                    justifyContent: "flex-start",
+                    marginTop: "10px",
+                  }}
+                >
+                  {nft?.sale && nft.token.owner_id == Tenk?.account.accountId && (
+                    <>
+                      {nft.sale.bids && (
                         <button
                           className="purple"
                           style={{ marginRight: "10px" }}
@@ -301,28 +315,29 @@ export const AuctionView = ({ show, setShow }: Props) => {
                         >
                           Accept Bid
                         </button>
-                      </>
-                    )}
-                    <button
-                      style={{ backgroundColor: "red" }}
-                      onClick={(e) => cancelAuction()}
-                    >
-                      Cancel Auction
-                    </button>
-                  </>
-                )}
-                {claimable && (
-                  <>
-                    <button className="purple" onClick={(e) => claimNFT()}>
-                      Claim NFT
-                    </button>
-                  </>
-                )}
+                      )}
+                      <button
+                        style={{ backgroundColor: "red" }}
+                        onClick={(e) => cancelAuction()}
+                      >
+                        Cancel Auction
+                      </button>
+                    </>
+                  )}
+                  {claimable && (
+                    <div>
+                      <button className="purple" onClick={(e) => claimNFT()}>
+                        Claim NFT
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+      {loading && <Spinner showOverlay={true} />}
     </>
   ) : (
     <>

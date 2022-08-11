@@ -29,6 +29,8 @@ export type ShowModal = {
   loading: boolean;
 };
 
+export type TimeLeft = { left: string; endDate: string };
+
 type Props = {
   saleNFTsQuery: UseQueryResult<TokenSale[], unknown>;
 };
@@ -41,11 +43,10 @@ export const Marketplace = ({ saleNFTsQuery }: Props) => {
   });
 
   const { Tenk } = useTenkNear();
-  const { Auction } = useAuctionNear();
 
   const { data: nfts = [] } = saleNFTsQuery;
 
-  const [timeLeft, setTimeLeft] = useState<String[]>();
+  const [timeLeft, setTimeLeft] = useState<TimeLeft[]>([]);
 
   useEffect(() => {
     const timeoutId = setTimeout(step, 1000);
@@ -61,11 +62,19 @@ export const Marketplace = ({ saleNFTsQuery }: Props) => {
   function step() {
     // const nowTime = (new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000)).getTime();
     const nowTime = new Date().getTime();
-    const lefts: string[] = [];
+    const lefts: TimeLeft[] = [];
     for (let i = 0; i < nfts?.length!; i++) {
       const end_at = nfts![i].sale?.end_at;
       if (end_at) {
         const remaining = parseInt(end_at) - nowTime;
+        const splitDate = new Date(end_at).toString().split(" ");
+        const endDay = splitDate[0];
+        const splitHour = splitDate[4].split(":");
+        const isPM = parseInt(splitHour[0]) > 12;
+        const endHour = `${isPM ? parseInt(splitHour[0]) - 12 : splitHour[0]}:${
+          splitHour[1]
+        }`;
+        const endDate = `${endDay}, ${endHour} ${isPM ? "PM" : "AM"}`;
 
         let left = "Ended";
         if (remaining > 0) {
@@ -75,17 +84,16 @@ export const Marketplace = ({ saleNFTsQuery }: Props) => {
           const seconds = Math.floor((remaining / 1000) % 60);
 
           if (days > 0) {
-            left = `${days} ${days === 1 ? "Day" : "Days"} and ${hours}:${
-              minutes < 10 ? "0" + minutes : minutes
-            }:${seconds < 10 ? "0" + seconds : seconds}`;
+            left = `${days}D ${hours > 0 ? hours + "H" : ""}`;
+          } else if (hours > 0) {
+            left = `${hours}H ${minutes > 0 ? minutes + "m" : ""}`;
+          } else if (minutes > 0) {
+            left = `${minutes}m ${seconds > 0 ? seconds + "s" : ""}`;
           } else {
-            left = `${hours}:${minutes < 10 ? "0" + minutes : minutes}:${
-              seconds < 10 ? "0" + seconds : seconds
-            }`;
+            left = `${seconds} Seconds`;
           }
         }
-
-        lefts.push(left);
+        lefts.push({ left, endDate });
       }
     }
     setTimeLeft(lefts);
@@ -115,77 +123,160 @@ export const Marketplace = ({ saleNFTsQuery }: Props) => {
         <div className="dlion">
           <div className={css.nft_tokens}>
             <>
-              {nfts.map((nft, index) => {
-                return (
-                  <StyledContent key={nft.token.token_id}>
-                    <div
-                      className={css.nft_token}
-                      id={"marketcard" + nft.token.token_id}
-                      style={{ display: "none" }}
-                    >
-                      <img
-                        alt="NFT"
-                        onLoad={() => {
-                          document
-                            .getElementById("marketcard" + nft.token.token_id)
-                            ?.setAttribute("style", "display: inherit");
+              {timeLeft.length > 0 &&
+                nfts.map((nft, index) => {
+                  return (
+                    <StyledContent key={nft.token.token_id}>
+                      <div
+                        className={css.nft_token}
+                        id={"marketcard" + nft.token.token_id}
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "space-between",
                         }}
-                        src={
-                          "https://bafybeibghcllcmurku7lxyg4wgxn2zsu5qqk7h4r6bmyhpztmyd564cx54.ipfs.nftstorage.link/" +
-                          nft.token.metadata?.media
-                        }
-                        onClick={(e) => handleOnClick("NFTDetail", nft)}
-                      />
-                      <div className={css.nft_token_info}>
-                        <div style={{ display: "flex" }}>
-                          <div>
-                            {timeLeft && (
-                              <>
-                                <b className="title">
-                                  Remaining: {timeLeft![index]}
-                                </b>
-                                <br />
-                              </>
-                            )}
-                            <b className="title">
-                              NFT Id: {nft.token.token_id}
-                            </b>
-                            <br />
+                      >
+                        <div>
+                          <div
+                            style={{
+                              textAlign: "center",
+                              background: "#FFD26288",
+                              marginBottom: "10px",
+                            }}
+                          >
+                            <p>
+                              {nft.nftsName} {nft.token.token_id}
+                            </p>
                           </div>
+                          <img
+                            alt="NFT"
+                            onLoad={() => {
+                              document
+                                .getElementById(
+                                  "marketcard" + nft.token.token_id
+                                )
+                                ?.setAttribute("style", "display: inherit");
+                            }}
+                            src={
+                              "https://bafybeibghcllcmurku7lxyg4wgxn2zsu5qqk7h4r6bmyhpztmyd564cx54.ipfs.nftstorage.link/" +
+                              nft.token.metadata?.media
+                            }
+                            onClick={(e) => handleOnClick("NFTDetail", nft)}
+                          />
                         </div>
-                        <div style={{ display: "flex" }}>
+                        <div className={css.nft_token_info}>
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              fontSize: "16px",
+                              lineHeight: "10px",
+                            }}
+                          >
+                            <div>
+                              {timeLeft && (
+                                <p>
+                                  Time Left{" "}
+                                  {timeLeft[index]
+                                    ? timeLeft[index].left
+                                    : ": loading..."}
+                                </p>
+                              )}
+                            </div>
+                            <div>
+                              {timeLeft && (
+                                <p>
+                                  {nft.sale?.bids &&
+                                    `${nft.sale.bids_length} ${
+                                      nft.sale.bids_length === 1
+                                        ? "Bid"
+                                        : "Bids"
+                                    }`}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              fontSize: "14px",
+                            }}
+                          >
+                            <div>
+                              {timeLeft && (
+                                <p>
+                                  {timeLeft[index] &&
+                                    `(${timeLeft[index].endDate})`}
+                                </p>
+                              )}
+                            </div>
+                            <div>
+                              {timeLeft && nft.sale?.last_bid_price && (
+                                <p>
+                                  {`${nft.sale?.last_bid_price} ${
+                                    nft.sale?.ft_token_type == "near"
+                                      ? "$NEAR"
+                                      : "$CHEDDAR"
+                                  }`}
+                                </p>
+                              )}
+                              {timeLeft &&
+                                !nft.sale?.last_bid_price &&
+                                nft.sale?.price && (
+                                  <p>
+                                    {`${(
+                                      nft.sale.price / Math.pow(10, 24)
+                                    ).toFixed(2)} ${
+                                      nft.sale?.ft_token_type == "near"
+                                        ? "$NEAR"
+                                        : "$CHEDDAR"
+                                    }`}
+                                  </p>
+                                )}
+                            </div>
+                          </div>
                           {timeLeft &&
-                            timeLeft![index] != "Ended" &&
+                            timeLeft[index].left != "Ended" &&
                             nft.token.owner_id != Tenk?.account.accountId && (
-                              <div style={{ alignSelf: "flex-end" }}>
-                                <button
-                                  className="purple"
-                                  onClick={() =>
-                                    handleOnClick("AuctionBid", nft)
-                                  }
-                                >
-                                  Place Bid
-                                </button>
-                              </div>
-                            )}
-                          {timeLeft && timeLeft![index] == "Ended" && (
-                            <div style={{ alignSelf: "flex-end" }}>
                               <button
                                 className="purple"
+                                style={{ marginTop: "5px" }}
+                                onClick={() => handleOnClick("AuctionBid", nft)}
+                              >
+                                Place Bid
+                              </button>
+                            )}
+                          {timeLeft &&
+                            nft.token.owner_id === Tenk?.account.accountId && (
+                              <button
+                                className="purple"
+                                style={{ marginTop: "5px" }}
+                                onClick={() =>
+                                  handleOnClick("AuctionView", nft)
+                                }
+                              >
+                                My Auction
+                              </button>
+                            )}
+                          {timeLeft &&
+                            timeLeft[index].left == "Ended" &&
+                            nft.token.owner_id != Tenk?.account.accountId && (
+                              <button
+                                className="purple"
+                                style={{ marginTop: "5px" }}
                                 onClick={() =>
                                   handleOnClick("AuctionView", nft)
                                 }
                               >
                                 View Auction
                               </button>
-                            </div>
-                          )}
+                            )}
                         </div>
                       </div>
-                    </div>
-                  </StyledContent>
-                );
-              })}
+                    </StyledContent>
+                  );
+                })}
             </>
           </div>
         </div>
