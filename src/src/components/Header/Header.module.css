@@ -14,13 +14,19 @@
 
 .header_container_content {
   align-items: center;
-  display: grid;
+  display: flex;
+  justify-content: space-between;
   gap: var(--spacing-xs);
-  grid-template-columns: 1fr 1.2fr 1fr;
+  grid-template-columns: 4.8fr 1.2fr 1fr;
   width: 100%;
 }
 
 .header_social_container {
+  display: flex;
+  gap: var(--spacing-s);
+}
+
+.header_social_container div {
   display: flex;
   gap: var(--spacing-s);
 }

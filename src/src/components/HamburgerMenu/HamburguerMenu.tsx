@@ -5,8 +5,28 @@ import { Dropdown } from "../Dropdown/Dropdown";
 import useNear from "../../hooks/useTenkNear";
 import { useLocation, useNavigate } from "react-router-dom";
 import Spinner from "../Spinner/Spinner";
+import checkersIcon from "../../Assets/imgs/checkers-icon.svg";
+import cheddarIcon from "../../Assets/imgs/cheddar-icon.svg";
+import gamepadIcon from "../../Assets/imgs/gamepad-icon.svg";
+import paletteIcon from "../../Assets/imgs/palette-icon.svg";
+import swapIcon from "../../Assets/imgs/swap-icon.svg";
+import thunderIcon from "../../Assets/imgs/thunder-icon.svg";
+import { styled } from "@stitches/react";
 
-export const HamburgerMenu = () => {
+const CheddarLinks = styled("a", {
+  padding: "1px 6px",
+  display: "flex",
+  flexDirection: "row",
+  alignItems: "center",
+  borderRadius: "6px",
+  margin: "0px 0px",
+});
+
+type Props = {
+  screenWidth: number;
+};
+
+export const HamburgerMenu = ({ screenWidth }: Props) => {
   const [showMenu, setShowMenu] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -20,6 +40,8 @@ export const HamburgerMenu = () => {
       navigate(path);
     }
   };
+
+  const pagesBreakpoint = 576;
 
   let navigate = useNavigate();
 
@@ -59,6 +81,7 @@ export const HamburgerMenu = () => {
           className={css.sidenav}
           style={{
             width: showMenu ? "80vw" : "0vw",
+            fontSize: screenWidth < pagesBreakpoint ? "22px" : "18px",
           }}
         >
           {showMenu && (
@@ -70,27 +93,30 @@ export const HamburgerMenu = () => {
               width="30px"
             />
           )}
-          <div
-            className={css.link}
-            onClick={() => handleClose("/")}
-            style={{
-              background: isMarketplace() ? "#3333" : "",
-            }}
-          >
-            <span
+          {screenWidth < pagesBreakpoint && (
+            <div
+              className={css.link}
+              onClick={() => handleClose("/")}
               style={{
-                fontSize: "24px",
+                background: isMarketplace() ? "#ffd26288" : "",
               }}
             >
-              Marketplace
-            </span>
-          </div>
-          {wallet && wallet.getAccountId() && (
+              <span
+                style={{
+                  fontSize: "24px",
+                }}
+              >
+                Marketplace
+              </span>
+            </div>
+          )}
+          {wallet && wallet.getAccountId() && screenWidth < pagesBreakpoint && (
             <div
               className={css.link}
               onClick={() => handleClose("/myassets")}
               style={{
-                background: !isMarketplace() ? "#3333" : "",
+                background: !isMarketplace() ? "#ffd26288" : "",
+                marginBottom: "20px",
               }}
             >
               <span
@@ -102,6 +128,50 @@ export const HamburgerMenu = () => {
               </span>
             </div>
           )}
+          <CheddarLinks href="https://draw.cheddar.farm" target="_blank">
+            Draw&nbsp;
+            <img src={paletteIcon} alt="" width={32} height={32} />
+          </CheddarLinks>
+          <CheddarLinks
+            href="https://vps179324.iceservers.net/"
+            target="_blank"
+          >
+            Coinflip&nbsp;
+            <img src={cheddarIcon} alt="" width={26} height={26} />
+          </CheddarLinks>
+          <CheddarLinks href="https://checkers.cheddar.farm/" target="_blank">
+            Checkers&nbsp;
+            <img src={checkersIcon} alt="" width={26} height={26} />
+          </CheddarLinks>
+          <CheddarLinks
+            href="https://nearhub.club/cdcUv8P/cheddar-farm"
+            target="_blank"
+          >
+            Vr&nbsp;Farm&nbsp;
+            <img src={gamepadIcon} alt="" width={26} height={26} />
+          </CheddarLinks>
+          <CheddarLinks href="https://nft.cheddar.farm/" target="_blank">
+            Power&nbsp;Up&nbsp;
+            <img src={thunderIcon} alt="" width={26} height={26} />
+          </CheddarLinks>
+          <CheddarLinks
+            href="https://app.ref.finance/#token.cheddar.near%7Cwrap.near"
+            target="_blank"
+          >
+            Ref&nbsp;Swap&nbsp;
+            <img
+              src={swapIcon}
+              alt=""
+              width={26}
+              height={26}
+              style={{
+                borderRadius: "13px",
+                padding: "2px",
+                background: "#8542eb44",
+              }}
+            />
+          </CheddarLinks>
+
           {wallet &&
             (wallet.getAccountId() ? (
               <div style={{ padding: "8px 32px 8px 32px" }}>
@@ -131,12 +201,16 @@ export const HamburgerMenu = () => {
       <button
         className={css.openbtn}
         onClick={handleOpen}
-        style={{ backgroundColor: "#ffd262", height: "45px", width: "45px" }}
+        style={{
+          backgroundColor: "#ffd262",
+          height: screenWidth < pagesBreakpoint ? "45px" : "30px",
+          width: screenWidth < pagesBreakpoint ? "45px" : "30px",
+        }}
       >
         <HamburgerMenuIcon
           color="black"
-          height="30px"
-          width="30px"
+          height={screenWidth < pagesBreakpoint ? "30px" : "16px"}
+          width={screenWidth < pagesBreakpoint ? "30px" : "16px"}
           style={{ verticalAlign: "middle" }}
         />
       </button>

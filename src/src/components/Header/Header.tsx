@@ -7,6 +7,24 @@ import { HamburgerMenu } from "../HamburgerMenu/HamburguerMenu";
 import useScreenSize from "../../hooks/useScreenSize";
 import { useState } from "react";
 import Spinner from "../Spinner/Spinner";
+import { styled } from "@stitches/react";
+import { blackA, whiteA } from "@radix-ui/colors";
+import checkersIcon from "../../Assets/imgs/checkers-icon.svg";
+import cheddarIcon from "../../Assets/imgs/cheddar-icon.svg";
+import gamepadIcon from "../../Assets/imgs/gamepad-icon.svg";
+import paletteIcon from "../../Assets/imgs/palette-icon.svg";
+import swapIcon from "../../Assets/imgs/swap-icon.svg";
+import thunderIcon from "../../Assets/imgs/thunder-icon.svg";
+
+const CheddarLinks = styled("a", {
+  backgroundColor: whiteA.whiteA9,
+  padding: "1px 6px",
+  display: "flex",
+  alignItems: "center",
+  borderRadius: "6px",
+  margin: "0px 0px",
+  border: "#8542eb66 1px solid",
+});
 
 export const Header = () => {
   let navigate = useNavigate();
@@ -23,7 +41,8 @@ export const Header = () => {
 
   const { width } = useScreenSize();
 
-  const hamburgerBreakpoint = 576;
+  const hamburgerBreakpoint = 992;
+  const pagesBreakpoint = 576;
 
   const singOutAndRedirect = () => {
     navigate("/");
@@ -87,8 +106,58 @@ export const Header = () => {
                 ></path>
               </svg>
             </a>
+            {width >= hamburgerBreakpoint && (
+              <div>
+                <CheddarLinks href="https://draw.cheddar.farm" target="_blank">
+                  Draw&nbsp;
+                  <img src={paletteIcon} alt="" width={24} height={24} />
+                </CheddarLinks>
+                <CheddarLinks
+                  href="https://vps179324.iceservers.net/"
+                  target="_blank"
+                >
+                  Coinflip&nbsp;
+                  <img src={cheddarIcon} alt="" width={20} height={20} />
+                </CheddarLinks>
+                <CheddarLinks
+                  href="https://checkers.cheddar.farm/"
+                  target="_blank"
+                >
+                  Checkers&nbsp;
+                  <img src={checkersIcon} alt="" width={20} height={20} />
+                </CheddarLinks>
+                <CheddarLinks
+                  href="https://nearhub.club/cdcUv8P/cheddar-farm"
+                  target="_blank"
+                >
+                  Vr&nbsp;Farm&nbsp;
+                  <img src={gamepadIcon} alt="" width={20} height={20} />
+                </CheddarLinks>
+                <CheddarLinks href="https://nft.cheddar.farm/" target="_blank">
+                  Power&nbsp;Up&nbsp;
+                  <img src={thunderIcon} alt="" width={20} height={20} />
+                </CheddarLinks>
+                <CheddarLinks
+                  href="https://app.ref.finance/#token.cheddar.near%7Cwrap.near"
+                  target="_blank"
+                >
+                  Ref&nbsp;Swap&nbsp;
+                  <img
+                    src={swapIcon}
+                    alt=""
+                    width={22}
+                    height={22}
+                    style={{
+                      borderRadius: "10px",
+                      padding: "2px",
+                      background: "#8542eb44",
+                    }}
+                  />
+                </CheddarLinks>
+              </div>
+            )}
           </div>
-          {width >= hamburgerBreakpoint && (
+          {width >= pagesBreakpoint && (
             <div
               style={{
                 display: "flex",
@@ -118,34 +187,35 @@ export const Header = () => {
               )}
             </div>
           )}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "end",
-            }}
-          >
-            {width >= hamburgerBreakpoint &&
-              wallet &&
-              (wallet.getAccountId() ? (
-                <Dropdown
-                  trigger={
-                    wallet?.getAccountId().length > 16
-                      ? wallet?.getAccountId().substring(0, 16) + "..."
-                      : wallet?.getAccountId()
-                  }
-                  items={[
-                    {
-                      children: "Sign Out",
-                      onSelect: singOutAndRedirect,
-                    },
-                  ]}
-                />
-              ) : (
-                <button className="yellow" onClick={signInWhitSpinner}>
-                  Sign In
-                </button>
-              ))}
-          </div>
+          {width >= hamburgerBreakpoint && (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "end",
+              }}
+            >
+              {wallet &&
+                (wallet.getAccountId() ? (
+                  <Dropdown
+                    trigger={
+                      wallet?.getAccountId().length > 16
+                        ? wallet?.getAccountId().substring(0, 16) + "..."
+                        : wallet?.getAccountId()
+                    }
+                    items={[
+                      {
+                        children: "Sign Out",
+                        onSelect: singOutAndRedirect,
+                      },
+                    ]}
+                  />
+                ) : (
+                  <button className="yellow" onClick={signInWhitSpinner}>
+                    Sign In
+                  </button>
+                ))}
+            </div>
+          )}
           {width < hamburgerBreakpoint && (
             <div
               style={{
@@ -154,7 +224,7 @@ export const Header = () => {
               }}
             >
               {" "}
-              <HamburgerMenu />
+              <HamburgerMenu screenWidth={width} />
             </div>
           )}
         </div>
