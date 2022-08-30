@@ -44,27 +44,35 @@ const getAuctions = async (
     if (res) {
       for (let i = 0; i < res.length; i++) {
         const sale: Sale = await getSaleForNFT(res[i].token_id, auction);
-        const bids: Bid[] = sale.bids
-          ? new Map<string, Bid[]>(Object.entries(sale.bids)).get(
-              sale.ft_token_type
-            ) || []
-          : [];
+        if (sale) {
+          const bids: Bid[] = sale.bids
+            ? new Map<string, Bid[]>(Object.entries(sale.bids)).get(
+                sale.ft_token_type
+              ) || []
+            : [];
 
-        const token_sale = {
-          token: res[i],
-          sale: {
-            ...sale,
-            bids_length: bids.length,
-            last_bid_price:
-              bids.length > 0
-                ? (
-                    parseInt(bids[bids.length - 1].price) / Math.pow(10, 24)
-                  ).toFixed(2)
-                : undefined,
-          },
-          nftsName: contractMetadata.name,
-        };
-        token_sales.push(token_sale);
+          const token_sale = {
+            token: res[i],
+            sale: {
+              ...sale,
+              bids_length: bids.length,
+              last_bid_price:
+                bids.length > 0
+                  ? (
+                      parseInt(bids[bids.length - 1].price) / Math.pow(10, 24)
+                    ).toFixed(2)
+                  : undefined,
+            },
+            nftsName: contractMetadata.name,
+          };
+          token_sales.push(token_sale);
+        } else {
+          const token_sale = {
+            token: res[i],
+            nftsName: contractMetadata.name,
+          };
+          token_sales.push(token_sale);
+        }
       }
     }
   }
